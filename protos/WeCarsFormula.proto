@@ -1,0 +1,11 @@
+#VRML_SIM R2023b utf8
+PROTO WeCarsFormula [
+  field SFFloat trackWidth 1.5 -- track width in meters
+  field SFFloat wheelBase 2.5 -- wheel base in meters
+  field SFFloat wheelRadius 0.5 -- wheel radius in meters (includes tire and rim)
+  field 
+
+]
+{
+  protoBody
+}

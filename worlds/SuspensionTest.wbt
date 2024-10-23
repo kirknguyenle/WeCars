@@ -1,0 +1,18 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.1578568080414123 0.011856928768719166 0.9873908250511295 3.0567754474935653
+  position 3.2925931467070684 -0.368828440801432 1.022183576538999
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 3 3
+  wallHeight 0.0001
+}
+DEF Car_Body Robot {
+  translation 0 0 0.23
+}
