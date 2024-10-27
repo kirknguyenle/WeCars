@@ -1,18 +1,64 @@
-#VRML_SIM R2022a utf8
-WorldInfo {
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+DEF WorldData WorldInfo {
+  contactProperties [
+    DEF Contact1 ContactProperties {
+      material1 "Ground"
+      material2 "Tire1"
+      coulombFriction [
+        0
+      ]
+      forceDependentSlip [
+        20
+      ]
+    }
+  ]
 }
-Viewpoint {
-  orientation -0.1578568080414123 0.011856928768719166 0.9873908250511295 3.0567754474935653
-  position 3.2925931467070684 -0.368828440801432 1.022183576538999
+DEF Camera Viewpoint {
+  orientation -0.11119784485144582 -0.05384866916285163 0.9923383294672152 4.473343013096482
+  position 0.8724462653418391 3.2728146028680865 0.5845354448434291
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-RectangleArena {
+DEF Ground RectangleArena {
+  translation 0 0 -0.431798
+  contactMaterial "Ground"
   floorSize 3 3
   wallHeight 0.0001
 }
-DEF Car_Body Robot {
-  translation 0 0 0.23
+DEF tire_supervisor Robot {
+  controller "tire_supervisor"
+  supervisor TRUE
+}
+DEF Tire Robot {
+  translation -1.2580638084510445e-16 1.8303724672618778e-07 -0.33426352191453734
+  rotation -1 -8.28187057235293e-16 -8.600979833505676e-16 1.5707963267948968
+  children [
+    DEF Body Transform {
+      children [
+        DEF Tire_Body Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 0
+          }
+          geometry Cylinder {
+            height 0.1
+            radius 0.1
+          }
+        }
+      ]
+    }
+  ]
+  name "robot(1)"
+  contactMaterial "Tire1"
+  boundingObject USE Tire_Body
+  physics Physics {
+  }
+  linearVelocity -9.356916306102643e-30 -1.261334011454524e-17 2.1712586625457605e-16
+  angularVelocity -3.392591660227376e-16 -9.45803218938103e-29 2.530209835101176e-32
 }
