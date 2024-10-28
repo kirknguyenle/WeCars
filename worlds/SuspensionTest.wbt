@@ -10,17 +10,17 @@ DEF WorldData WorldInfo {
       material1 "Ground"
       material2 "Tire1"
       coulombFriction [
-        0
+        3
       ]
       forceDependentSlip [
-        20
+        1
       ]
     }
   ]
 }
 DEF Camera Viewpoint {
-  orientation -0.11119784485144582 -0.05384866916285163 0.9923383294672152 4.473343013096482
-  position 0.8724462653418391 3.2728146028680865 0.5845354448434291
+  orientation -0.4007199871002175 -0.0807670171964887 0.9126336509638376 2.926182159819194
+  position 16.37595580524209 -6.243974126916012 16.289884391716715
 }
 TexturedBackground {
 }
@@ -32,33 +32,35 @@ DEF Ground RectangleArena {
   floorSize 3 3
   wallHeight 0.0001
 }
-DEF tire_supervisor Robot {
-  controller "tire_supervisor"
-  supervisor TRUE
-}
 DEF Tire Robot {
   translation -1.2580638084510445e-16 1.8303724672618778e-07 -0.33426352191453734
   rotation -1 -8.28187057235293e-16 -8.600979833505676e-16 1.5707963267948968
   children [
-    DEF Body Transform {
-      children [
-        DEF Tire_Body Shape {
-          appearance PBRAppearance {
-            baseColor 0 0 0
-          }
-          geometry Cylinder {
-            height 0.1
-            radius 0.1
-          }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+      }
+      device [
+        DEF Motor RotationalMotor {
         }
       ]
+      endPoint Solid {
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0 0 0
+            }
+            geometry Cylinder {
+              height 0.1
+              radius 0.1
+            }
+          }
+        ]
+      }
     }
   ]
   name "robot(1)"
   contactMaterial "Tire1"
-  boundingObject USE Tire_Body
   physics Physics {
   }
-  linearVelocity -9.356916306102643e-30 -1.261334011454524e-17 2.1712586625457605e-16
-  angularVelocity -3.392591660227376e-16 -9.45803218938103e-29 2.530209835101176e-32
+  controller "tire_controller"
 }

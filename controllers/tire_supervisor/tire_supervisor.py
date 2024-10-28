@@ -8,17 +8,20 @@ robot = Supervisor()  # create Supervisor instance
 # [CODE PLACEHOLDER 1]
 mc_node = robot.getFromDef('Contact1')
 c_node = robot.getFromDef('Camera')
-w_node = robot.getFromDef('Ground')
+t_node = robot.getFromDef('Tire')
+vec_node = robot.getFromDef('gps')
+
 
 
 if w_node == None:
     sys.exit(1)
 
+if vec_node == None:
+    sys.exit(1)
 
 
 coulomb_friction = mc_node.getField("coulombFriction")
 sideslipConstant = mc_node.getField("forceDependentSlip")
-origin = w_node.getField('translation')
 
 coulomb_friction.setMFFloat(0,0.0)
 
@@ -28,12 +31,8 @@ i = 0
 while robot.step(TIME_STEP) != -1:
   # [CODE PLACEHOLDER 2]
 
-  i += 1
-  if i < 900:
   
-    origin.setSFVec3f([i/200, i/200, -0.431798])
-  
-  if i == 40: 
+  if i == 100: 
   
       val = 2.0
   
@@ -41,7 +40,7 @@ while robot.step(TIME_STEP) != -1:
       
 
   
-  if i == 50: 
+  if i == 300: 
   
       side_val = 1
       
@@ -49,7 +48,7 @@ while robot.step(TIME_STEP) != -1:
       
 
   
-  if i == 80:
+  if i == 400:
       new_val = 3.0
       coulomb_friction.setMFFloat(0,new_val)
 #while robot.step(TIME_STEP) != -1:
