@@ -10,17 +10,18 @@ DEF WorldData WorldInfo {
       material1 "Ground"
       material2 "Tire1"
       coulombFriction [
-        3
+        2
       ]
       forceDependentSlip [
-        1
+        0, 1
       ]
     }
   ]
 }
 DEF Camera Viewpoint {
-  orientation -0.4007199871002175 -0.0807670171964887 0.9126336509638376 2.926182159819194
-  position 16.37595580524209 -6.243974126916012 16.289884391716715
+  orientation 0.19075459828781857 0.14658441538878597 -0.9706315945801378 1.8063624821849156
+  position 4.5246265375410974 3.6874513396406776 0.18979572249457766
+  follow "TireBot:solid"
 }
 TexturedBackground {
 }
@@ -29,25 +30,29 @@ TexturedBackgroundLight {
 DEF Ground RectangleArena {
   translation 0 0 -0.431798
   contactMaterial "Ground"
-  floorSize 3 3
+  floorSize 90 5
   wallHeight 0.0001
 }
 DEF Tire Robot {
-  translation -1.2580638084510445e-16 1.8303724672618778e-07 -0.33426352191453734
-  rotation -1 -8.28187057235293e-16 -8.600979833505676e-16 1.5707963267948968
+  translation 3.903068194513514 0.6391127514142129 -0.33506457521587446
+  rotation -0.8270564522347552 0.39671715339063457 0.39823752337329005 1.7636369100947278
   children [
     HingeJoint {
       jointParameters HingeJointParameters {
+        position 38.85808096085215
+        axis 0 0 1
       }
       device [
-        DEF Motor RotationalMotor {
+        DEF AxleMotor RotationalMotor {
+          name "AxleMotor"
         }
       ]
-      endPoint Solid {
+      endPoint DEF Wheel Solid {
+        rotation 0 0 1 1.1589691177746304
         children [
-          Shape {
+          DEF TIreShape Shape {
             appearance PBRAppearance {
-              baseColor 0 0 0
+              baseColor 0 1 0
             }
             geometry Cylinder {
               height 0.1
@@ -55,12 +60,24 @@ DEF Tire Robot {
             }
           }
         ]
+        contactMaterial "Tire1"
+        boundingObject USE TIreShape
+        physics DEF TirePhysics Physics {
+        }
+        linearVelocity 0.29698620299019957 0.3706265547489785 -2.1665954944650282e-07
+        angularVelocity -0.009896841496645888 2.9698518462744863 -0.007836315608369235
       }
     }
+    GPS {
+    }
   ]
-  name "robot(1)"
+  name "TireBot"
   contactMaterial "Tire1"
   physics Physics {
+    mass 1
   }
   controller "tire_controller"
+  supervisor TRUE
+  linearVelocity 0.2969862029826265 0.37062660662468533 -2.1666134375664303e-07
+  angularVelocity -7.76397939672568e-05 -0.17012177484273722 0.00048463052529503425
 }
