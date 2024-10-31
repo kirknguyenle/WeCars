@@ -1,0 +1,60 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+  contactProperties [
+    DEF Tires ContactProperties {
+      material1 "Ground"
+      material2 "Rubber"
+      forceDependentSlip [
+        0.2
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.04712779932849942 -0.9969806680573019 -0.06171319186745101 0.18687238633820843
+  position -1.5450901288248542 0.03566884647940342 -0.0031636672042804626
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Robot {
+  rotation 0 1 0 4.692820414042842e-06
+  children [
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0 3.24841 0.21
+      }
+      endPoint Solid {
+        translation 0 1.29819 0.018974
+        rotation 1 0 0 1.63
+        children [
+          Shape {
+            geometry Capsule {
+              height 2.601
+              radius 0.0025
+            }
+          }
+        ]
+        name "SwingArm"
+      }
+    }
+    DEF CarBody Solid {
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.333333 0 1
+          }
+          geometry Box {
+            size 1.55 0.1 0.1
+          }
+        }
+      ]
+    }
+  ]
+}

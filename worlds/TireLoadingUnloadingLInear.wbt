@@ -10,17 +10,17 @@ DEF WorldData WorldInfo {
       material1 "Ground"
       material2 "Tire1"
       coulombFriction [
-        0.2
+        300
       ]
       forceDependentSlip [
-        0, 0
+        1, 1
       ]
     }
   ]
 }
 DEF Camera Viewpoint {
   orientation 0.23987754852134577 0.03167566532787184 -0.9702862536084008 2.401973106229269
-  position 6.918244911240238 2.1531437924739483 0.22451912172795177
+  position 24.842493376391044 18.24795737794348 0.22453704166593602
   follow "TireBot:solid"
 }
 TexturedBackground {
@@ -30,16 +30,16 @@ TexturedBackgroundLight {
 DEF Ground RectangleArena {
   translation 0 0 -0.431798
   contactMaterial "Ground"
-  floorSize 90 5
+  floorSize 90 200
   wallHeight 0.0001
 }
 DEF Tire Robot {
-  translation 5.613877782342407 1.2074166327693108 -0.3350649721426859
-  rotation 0.329191205086523 0.6699499461499935 0.6654323558013269 -2.500109009708358
+  translation 23.52792063252035 17.323906115223863 -0.335064017915964
+  rotation 0.9809165096319293 0.14207175009850218 0.13273439251174393 -1.588736998458356
   children [
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 103.52028706862991
+        position 313.3775692470876
         axis 0 0 1
       }
       device [
@@ -48,7 +48,7 @@ DEF Tire Robot {
         }
       ]
       endPoint DEF Wheel Solid {
-        rotation 0 0 0.9999999999999999 2.9893221537565284
+        rotation 0 0 -1 0.7816961118917316
         children [
           DEF TIreShape Shape {
             appearance PBRAppearance {
@@ -64,8 +64,8 @@ DEF Tire Robot {
         boundingObject USE TIreShape
         physics DEF TirePhysics Physics {
         }
-        linearVelocity 0.2972945275632549 0.0018689010797663225 7.938355097656677e-08
-        angularVelocity -0.018638921560745713 2.9729258979997275 -0.010821279944094419
+        linearVelocity 0.4728319038282488 0.0057174375745450605 1.1753385058014745e-12
+        angularVelocity -0.04494041014987022 4.728484465404828 0.00033203856375025773
       }
     }
     GPS {
@@ -78,6 +78,6 @@ DEF Tire Robot {
   }
   controller "tire_controller"
   supervisor TRUE
-  linearVelocity 0.29729452757639563 0.0018689004418103972 7.931951635397414e-08
-  angularVelocity 0.001213644253264725 -0.16699061867086584 0.0005868015164987465
+  linearVelocity 0.47283190383043805 0.005717437393288423 1.1754650591283175e-12
+  angularVelocity 0.0025807974464823772 -0.2712897030042724 0.00034509333165471854
 }

@@ -18,44 +18,31 @@ coulomb_friction = mc_node.getField("coulombFriction")
 sideslipConstant = mc_node.getField("forceDependentSlip")
 
 
-data = robot.getDevice('gps')
-data.enable(TIME_STEP)
+mf_var = [0, 0, 0, 0] # Magic Formula parameters D,C,B,E
 
 
-slipAngle = 0.0
-
-
+S = 0.0
 
 coulomb_friction.setMFFloat(0,300)
 
-sideslipConstant.setMFFloat(0, 1)
-sideslipConstant.setMFFloat(1, 1)
-vI = [1, 1, 0, 0, 0, 0]  
-v2 = [1, -1, 0, 0, 0, 0]  
-v3 = [1, 0, 0, 0, 0, 0]  
+sideslipConstant.setMFFloat(0, 0)
+sideslipConstant.setMFFloat(1, 0)
 
 k = 1
 
-motor = robot.getDevice('AxleMotor')  # get the motor device
 
-v_last = 1
 
-if motor == None:
-    sys.exit(1)
-
-motor.setPosition(float('inf')) 
-motor.setVelocity(0.0)  # set the velocity to zero
 i = 0
 slip = 0.0
-lslip =0.0
-#tire_node.setVelocity(vI)
 
 useMF = False
+
+v_x = 0.0
 
 while robot.step(TIME_STEP) != -1:
     
     i +=1
-    v_C = vI = [1, 0, 0, 0, 0, 0]
+    v_C = [v_x, 0, 0, 0, 0, 0]
     v_C[1] = v_C[1]+ i/1000
     
     tire_node.setVelocity(v_C)
@@ -64,22 +51,24 @@ while robot.step(TIME_STEP) != -1:
     
     abs_vy = absolute_v[1]
     
-    tire_node.setVelocity(vI)# roll forward
+    tire_node.setVelocity(v_C)# roll forward
     if absolute_v[0] != 0.0:
         slip = numpy.arctan(abs_vy/absolute_v[0])
     
-    if absolute_v[0] != 0.0:
-        v_y = numpy.tan(slipAngle)*absolute_v[0]
-    
-    #print('wanted Vy ',v_y)
-    #print('dv ', dv)
     print('slip \n', numpy.degrees(slip))
    
     print('abs_vy \n', abs_vy)
    
     print('lateral force \n', k*slip)
+    
+    if useMF:
+        f_y = mf_var[0]*numpy.sin(mf_var[1]*numpy.arctan(mf_var[2]*slip-mf_var[3]*(mf_var[2]*slip-numpy.arctan(mf_var[2]*slip))))
+        S = numpy.tan(slip)/(f_y*absolute_v[0])
+        sideslipConstant.setMFFloat(1, S) 
+        print('MF dynamic \n',S)
+    else:
      
-    S = numpy.tan(slip)/(k*slip*1)
-    sideslipConstant.setMFFloat(1, S) 
-    print('FDS dynamic \n',S)
+        S = numpy.tan(slip)/(k*slip*absolute_v[0])
+        sideslipConstant.setMFFloat(1, S) 
+        print('FDS dynamic \n',S)
   
