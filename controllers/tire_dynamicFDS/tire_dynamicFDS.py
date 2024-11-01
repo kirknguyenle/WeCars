@@ -31,18 +31,24 @@ if tire_node == None:
     
 coulomb_friction = mc_node.getField("coulombFriction")
 sideslipConstant = mc_node.getField("forceDependentSlip")
+mass = p_node.getField("mass")
+
 
 
 
 mf_var = [0, 0, 0, 0] # Magic Formula parameters D,C,B,E
 
 
+mu = 300.0
+
 S = 0.0
 
-coulomb_friction.setMFFloat(0,300)
+coulomb_friction.setMFFloat(0,mu)
 
 sideslipConstant.setMFFloat(0, 0)
-sideslipConstant.setMFFloat(1, 0)
+sideslipConstant.setMFFloat(1, S)
+
+F_n = mass.getSFFloat()*mu
 
 k = 50000
 
@@ -60,7 +66,6 @@ while robot.step(TIME_STEP) != -1:
     i +=1
     v_C = [v_x, 0, 0, 0, 0, 0]
     v_C[1] = v_C[1]+ i/1000
-    
     tire_node.setVelocity(v_C)
     
     absolute_v = tire_node.getVelocity()
@@ -83,15 +88,12 @@ while robot.step(TIME_STEP) != -1:
             sideslipConstant.setMFFloat(1, S) 
             print('MF dynamic \n',S)
         else:
-            f_y = k*slip
-            if f_y > 300:
-                f_y = 300
             S = (numpy.tan(slip)*absolute_v[0])/(k*slip)
             sideslipConstant.setMFFloat(1, S) 
             print('FDS dynamic \n',S)
     
    
-    file.write(str(i)+","+str(absolute_v[0])+","+str(k)+","+str(slip)+","+str(k*slip)+","+str(S)+","+str(absolute_v[1])+"\r\n")
+    file.write(str(i)+","+str(absolute_v[0])+","+str(k)+","+str(slip)+","+str(F_n)+","+str(S)+","+str(absolute_v[1])+"\r\n")
     
 file.close()
 

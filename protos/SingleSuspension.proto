@@ -12,23 +12,19 @@ PROTO SingleSuspension [
   field SFFloat WheelRadius 0.2286 // Wheel radius in meters
   field SFFloat WheelWidth 0.1524 // Wheel width in meters
   field SFVec3f TieRodAttachmentPoint 0 0 0 // Tie rod attachment point relative to wheel center in meters
-  field SFVec3f ControlRodAttachmentPoint 0 0 0 // Control rod attachment point relative to wheel center in meters
-  field SFFloat LowerFrontLinkLength 0.3048 // Length of the lower front link in meters
-  field SFFloat LowerRearLinkLength 0.3048 // Length of the upper front link in meters
-  field SFFloat UpperFrontLinkLength 0.3048 // Length of the lower rear link in meters
-  field SFFloat UpperRearLinkLength 0.3048 // Length of the upper rear link in meters
   field SFFloat TieRodLength 0.3048 // Length of the tie rod in meters
-  field SFVec3f UpperFrontPickupPoint 0 0 0 // Upper front pickup point relative to wheel center in meters
-  field SFVec3f UpperRearPickupPoint 0 0 0 // Upper rear pickup point relative to wheel center in meters
-  field SFVec3f LowerFrontPickupPoint 0 0 0 // Lower front pickup point relative to wheel center in meters
-  field SFVec3f LowerRearPickupPoint 0 0 0 // Lower rear pickup point relative to wheel center in meters
   field SFVec3f TieRodPickupPoint 0 0 0 // Tie rod pickup point relative to wheel center in meters
+  field SFFloat LowerArmLength 0.3048 // Length of the lower front link in meters
+  field SFFloat UpperArmLength 0.3048 // Length of the upper front link in meters
+  field SFVec3f UpperPickupPoint 0 0 0 // Upper front link pickup point relative to wheel center in meters
+  field SFVec3f LowerPickupPoint 0 0 0 // Lower front link pickup point relative to wheel center in meters
 
-  field boolean use_Mcphereson false // use Mcphereson strut instead of double wishbone
+  field boolean useMcphereson false // use Mcphereson strut instead of double wishbone
   field SFFloat McpheresonStrutLength 0.3048 // Length of the Mcphereson strut in meters
   field SFVec3f McpheresonStrutPickupPoint 0 0 0 // Mcphereson strut pickup point relative to wheel center in meters
 
-
+  field SFFloat tireRadius 0.2286 // tire radius in meters
+  field SFFloat tireWidth 0.1524 // tire width in meters
 
 
   field boolean use_damper true // simulate damper
@@ -37,12 +33,6 @@ PROTO SingleSuspension [
   field SFFloat SpringPreload 0 // Spring preload in meters
   field SFFloat SpringFreeLength 0.3048 // Spring free length in meters
   field SFFloat SpringDamping 1000 // Spring damping in N/m/s
-  field SFFloat ControlRodLength 0.3048 // Length of the control rod in meters
-  field SFVec3f BellCrankPickupPoint 0 0 0 // Bell crank attachment point relative to wheel center in meters
-  field SFFloat BellCrankIn  0.3048 // Scalar Distance between Bellcrank and Control Rod attachment point in meters
-  field SFFLoat BellCrankOut 0.3048 // Scalar Distance between Bellcrank and Coilover attachment point in meters
-  field SFFloat BellCrankAngle 0.3048 // Angle Between In and Out lengths in degrees
-  field SFVec3f CoiloverAttachmentPoint 0 0 0 // Coilover attachment point relative to wheel center in meters 
   field SFString name "Suspension" // Name of the suspension
   field SFString controller "Suspension_controller" // Name of the controller
 
@@ -53,64 +43,43 @@ PROTO SingleSuspension [
   %<
   import * as wbgeometry from 'wbgeometry.js';
   import * as wbrandom from 'wbrandom.js';
-  import * as wbvector2 from 'wbvector2.js';
+  import * as wbvector3 from 'wbvector3.js';
 
   // set SLA suspension values
-  
   let KH = fields.KnuckleHeight.value;
   let UBJ = fields.UpperBallJoint.value;
   let LBJ = fields.LowerBallJoint.value;
   let WR = fields.WheelRadius.value;
   let WW = fields.WheelWidth.value;
   let TRAP = fields.TieRodAttachmentPoint.value;
-  let CRAP = fields.ControlRodAttachmentPoint.value;
-  let LFL = fields.LowerFrontLinkLength.value;
-  let LRL = fields.LowerRearLinkLength.value;
-  let UFL = fields.UpperFrontLinkLength.value;
-  let URL = fields.UpperRearLinkLength.value;
+  let UAL = fields.UpperArmLength.value;
+  let LAL = fields.LowerArmLength.value;
   let TR = fields.TieRodLength.value;
-  let UFP = fields.UpperFrontPickupPoint.value;
-  let URP = fields.UpperRearPickupPoint.value;
-  let LFP = fields.LowerFrontPickupPoint.value;
-  let LRP = fields.LowerRearPickupPoint.value;
+  let UPP = fields.UpperPickupPoint.value;
+  let LPP = fields.LowerPickupPoint.value;
   let TRPP = fields.TieRodPickupPoint.value;
   
  // set Mcphereson strut values
   let useMcphereson = fields.use_Mcphereson.value;
   let McpheresonStrutLength = fields.McpheresonStrutLength.value;
-  let McpheresonStrutPickupPoint = fields.McpheresonStrutPickupPoint.value;
+  let mCPP = fields.McpheresonStrutPickupPoint.value;
   
   // set coilover values
   let useDamper = fields.use_damper.value;
   let useSpring = fields.use_spring.value;
   let SpringRate = fields.SpringRate.value;
   let SpringPreload = fields.SpringPreload.value;
-  let SpringFreeLength = fields.SpringFreeLength.value;
   let SpringDamping = fields.SpringDamping.value;
-  let ControlRodLength = fields.ControlRodLength.value;
-  let BCPP = fields.BellCrankPickupPoint.value;
-  let BCI = fields.BellCrankIn.value;
-  let BCO = fields.BellCrankOut.value; 
-  let BCA = fields.BellCrankAngle.value;
-  let CAP = fields.CoiloverAttachmentPoint.value;
+  let flipRight = fields.flipRight.value;
+  >% 
 
-  function carFrame(ufp, urp, lfp, lrp, trpp, bcpp, cap){
-    this.ufp = ufp;
-    this.urp = urp;
-    this.lfp = lfp;
-    this.lrp = lrp;
-    this.trpp = trpp;
-    this.bcpp = bcpp;
-    this.cap = cap;
-
-    this.vertices = [] 
-    this.createVertices = function(){
-      let x0
-    }
-  }
-
-
-
-
+  DEF SingleSuspension Robot{
+       
+   }
 
 }
+
+
+
+
+
