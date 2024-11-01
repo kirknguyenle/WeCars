@@ -10,7 +10,7 @@ run = datetime.now()
 runString= run.strftime("%d-%m-%Y-%H-%M-%S")
 
 save_path = (r"C:\Users\quoca\OneDrive\Desktop\Motorsports\WeCars\testData")
-filename = (r"dynamicFDS_" + runString)
+filename = (r"dynamicLongitudinalVx_" + runString)
 
 location = os.path.join(save_path, filename+".txt")
 print(location)
