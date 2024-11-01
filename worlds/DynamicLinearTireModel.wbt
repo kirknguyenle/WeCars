@@ -1,0 +1,79 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+DEF WorldData WorldInfo {
+  contactProperties [
+    DEF Contact1 ContactProperties {
+      material1 "Ground"
+      material2 "Tire1"
+      coulombFriction [
+        300
+      ]
+      forceDependentSlip [
+        0, 1.0330459091928985
+      ]
+    }
+  ]
+}
+DEF Camera Viewpoint {
+  orientation 0.23987754852134577 0.03167566532787184 -0.9702862536084008 2.401973106229269
+  position 24.842493376391044 18.24795737794348 0.22453704166593602
+  follow "TireBot:solid"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+DEF Ground RectangleArena {
+  translation 0 0 -0.431798
+  contactMaterial "Ground"
+  floorSize 90 200
+  wallHeight 0.0001
+}
+DEF Tire Robot {
+  translation 23.52792063252035 17.323906115223863 -0.335064017915964
+  rotation 0.9809165096319293 0.14207175009850218 0.13273439251174393 -1.588736998458356
+  children [
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 313.3775692470876
+        axis 0 0 1
+      }
+      device [
+        DEF AxleMotor RotationalMotor {
+          name "AxleMotor"
+        }
+      ]
+      endPoint DEF Wheel Solid {
+        rotation 0 0 -1 0.7816961118917316
+        children [
+          DEF TIreShape Shape {
+            appearance PBRAppearance {
+              baseColor 0 1 0
+            }
+            geometry Cylinder {
+              height 0.1
+              radius 0.1
+            }
+          }
+        ]
+        contactMaterial "Tire1"
+        boundingObject USE TIreShape
+        physics DEF TirePhysics Physics {
+        }
+      }
+    }
+    GPS {
+    }
+  ]
+  name "TireBot"
+  contactMaterial "Tire1"
+  physics Physics {
+    mass 1
+  }
+  controller "tire_dynamicFDS"
+  supervisor TRUE
+}
