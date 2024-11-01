@@ -1,7 +1,21 @@
 from controller import Supervisor,Robot, GPS, Motor, Node, TouchSensor
+from datetime import date, datetime
 import sys
 import numpy
 import math
+import os.path
+
+run = datetime.now()
+
+runString= run.strftime("%d-%m-%Y-%H-%M-%S")
+
+save_path = (r"C:\Users\quoca\OneDrive\Desktop\Motorsports\WeCars\testData")
+filename = (r"dynamicFDS_" + runString)
+
+location = os.path.join(save_path, filename+".txt")
+print(location)
+file = open(location, "w")
+file.write("#time,V_x,k,SlipAngle,LateralForce,DynamicS,AbsVy,\r\n")
 TIME_STEP = 32
 
 robot = Supervisor()  # create Robot instance
@@ -37,7 +51,7 @@ slip = 0.0
 
 useMF = False
 
-v_x = 0.0
+v_x = 1
 
 while robot.step(TIME_STEP) != -1:
     
@@ -60,15 +74,19 @@ while robot.step(TIME_STEP) != -1:
     print('abs_vy \n', abs_vy)
    
     print('lateral force \n', k*slip)
+    if slip != 0.0:
+        if useMF:
+            f_y = mf_var[0]*numpy.sin(mf_var[1]*numpy.arctan(mf_var[2]*slip-mf_var[3]*(mf_var[2]*slip-numpy.arctan(mf_var[2]*slip))))
+            S = numpy.tan(slip)/(f_y*absolute_v[0])
+            sideslipConstant.setMFFloat(1, S) 
+            print('MF dynamic \n',S)
+        else:
+            S = (numpy.tan(slip)*absolute_v[0])/(k*slip)
+            sideslipConstant.setMFFloat(1, S) 
+            print('FDS dynamic \n',S)
+            
+   
+    file.write(str(i)+","+str(absolute_v[0])+","+str(k)+","+str(slip)+","+str(k*slip)+","+str(S)+","+str(absolute_v[1])+"\r\n")
     
-    if useMF:
-        f_y = mf_var[0]*numpy.sin(mf_var[1]*numpy.arctan(mf_var[2]*slip-mf_var[3]*(mf_var[2]*slip-numpy.arctan(mf_var[2]*slip))))
-        S = numpy.tan(slip)/(f_y*absolute_v[0])
-        sideslipConstant.setMFFloat(1, S) 
-        print('MF dynamic \n',S)
-    else:
-     
-        S = numpy.tan(slip)/(k*slip*absolute_v[0])
-        sideslipConstant.setMFFloat(1, S) 
-        print('FDS dynamic \n',S)
-  
+file.close()
+
