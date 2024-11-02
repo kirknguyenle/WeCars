@@ -1,7 +1,7 @@
 import matplotlib.pyplot as mpl
 import numpy as np
 
-k = 3 #N/deg
+k = 3 #N/rad
 s = 3 #m/s/N
 v_x = 40 #m/s
 
@@ -10,7 +10,7 @@ linear = []
 webots = []
 print(angles)
 for i in range(len(angles)):
-    linear.append(k*i)
+    linear.append(k*np.radians(i))
     webots.append(((np.tan(np.radians(i))*v_x)/(s)))
 print(linear)
 
