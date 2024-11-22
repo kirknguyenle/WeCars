@@ -25,4 +25,5 @@ def createEulerZYXRotation(roll,pitch,yaw):
     return np.dot(Rx,Ry,Rz)
 
 
-
+def arrayToMatrix(array):
+    return np.array(array).reshape(3,3)

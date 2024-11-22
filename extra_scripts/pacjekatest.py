@@ -9,7 +9,7 @@ B = 0.714
 E = 0.2
 K = C*B*D
 
-angles = np.arange(0, 20,0.05)
+angles = np.arange(0, 4*1.57,0.05)
 linear = []
 pacjeka = []
 webots = []
@@ -23,7 +23,7 @@ for i in range (len(angles)):
 
 mpl.plot(angles, linear, label='Linear')
 mpl.plot(angles, pacjeka, label='Pacjeka')
-mpl.xlabel('Slip Angle (degrees)')
+mpl.xlabel('Slip Angle (radians)')
 mpl.ylabel('Lateral Force (N)')
 mpl.title('Comparison of Linear and Pacjeka Models')
 mpl.legend()

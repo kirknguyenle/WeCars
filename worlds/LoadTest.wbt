@@ -13,15 +13,14 @@ DEF WorldData WorldInfo {
         1000
       ]
       forceDependentSlip [
-        0, 9.998803183642458e-06
+        0, 0
       ]
     }
   ]
 }
 DEF Camera Viewpoint {
-  orientation 0.22884173497129734 0.9635653469500917 -0.13846762254142994 0.6988589924683335
-  position -0.9883662710230374 0.041979932531104804 0.5171023387894025
-  follow "TireBot:solid"
+  orientation 0.3204952409227408 0.8499956022785585 0.41807927077646984 0.31299015915884026
+  position -1.1881048589484375 -0.253813627781041 -0.06738982054391802
 }
 TexturedBackground {
 }
@@ -34,12 +33,12 @@ DEF Ground RectangleArena {
   wallHeight 0.0001
 }
 DEF Tire Robot {
-  translation 0 0 -0.335064
-  rotation 1 0 0 1.57
+  translation 6.207793403378516e-11 -7.843064389460278e-05 -0.3350640625176893
+  rotation 1 -1.7757524174852295e-11 1.7762133071705213e-11 1.5707842959282725
   children [
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 313.37757207192044
+        position 313.37757206870043
         axis 0 0 1
       }
       device [
@@ -48,11 +47,34 @@ DEF Tire Robot {
         }
       ]
       endPoint DEF Wheel Solid {
-        rotation 0 0 0.9999999999999999 2.745859902623502e-06
         children [
-          DEF TIreShape Shape {
-            appearance PBRAppearance {
-              baseColor 0 1 0
+          TouchSensor {
+            children [
+              DEF TreadShape Shape {
+                appearance Appearance {
+                  material Material {
+                    emissiveColor 1 0.666667 0.498039
+                    transparency 0.9
+                  }
+                }
+                geometry Cylinder {
+                  height 0.1005
+                  radius 0.1005
+                }
+              }
+            ]
+            name "loadSensor"
+            contactMaterial "Tire1"
+            boundingObject USE TreadShape
+            physics DEF TreadPhysics Physics {
+            }
+            type "force-3d"
+          }
+          DEF TireShape Shape {
+            appearance Appearance {
+              material Material {
+                diffuseColor 1 0.333333 1
+              }
             }
             geometry Cylinder {
               height 0.1
@@ -60,18 +82,15 @@ DEF Tire Robot {
             }
           }
         ]
-        contactMaterial "Tire1"
-        boundingObject USE TIreShape
-        physics DEF TirePhysics Physics {
+        boundingObject USE TireShape
+        physics Physics {
         }
       }
-    }
-    GPS {
     }
   ]
   name "TireBot"
   contactMaterial "Tire1"
-  physics Physics {
+  physics DEF TirePhysics Physics {
     mass 1
   }
   controller "tireRelativeVelocity"

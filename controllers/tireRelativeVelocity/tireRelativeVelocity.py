@@ -22,12 +22,16 @@ robot = Supervisor()  # create Robot instance
 mc_node = robot.getFromDef('Contact1')
 tire_node = robot.getFromDef('Wheel')
 p_node = robot.getFromDef('TirePhysics')
-
+load = robot.getDevice('loadSensor')
+load.enable(10)
 if mc_node == None:
     sys.exit(1)
     
 if tire_node == None: 
     sys.exit(1)
+
+
+
     
 coulomb_friction = mc_node.getField("coulombFriction")
 sideslipConstant = mc_node.getField("forceDependentSlip")
@@ -39,7 +43,7 @@ mass = p_node.getField("mass")
 mf_var = [100040, 1.4, 0.714, 0.2] # Magic Formula parameters D,C,B,E
 
 
-mu = 300.0
+mu = 1000
 
 S = 0.0
 
@@ -50,7 +54,7 @@ sideslipConstant.setMFFloat(1, S)
 
 F_n = mass.getSFFloat()*mu
 
-k = 50000
+k = 100040
 
 
 
@@ -62,24 +66,33 @@ useMF = False
 v_x = 1
 
 while robot.step(TIME_STEP) != -1:
-    
-    rotation = numpy.linalg.norm(tire_node.getOrientation())
-    if i == 80:
-        print('rotation \n', rotation)
-    i +=1
+
     v_C = [v_x, 0, 0, 0, 0, 0]
     v_C[1] = v_C[1]+ i/1000
+    rotation = numpy.array(tire_node.getOrientation()).reshape(3,3)
+    r_i = numpy.linalg.inv(rotation)
+    i +=1
+    tireForces = load.getValues()
+    print("force vector: \n", tireForces[2], "\n")
+  
+  
+    v_l = numpy.array(v_C[0:3]) # Legacy code
+    v_r = numpy.dot(r_i,v_l) # Legacy Right Now
+    
+    
+    
+    
     tire_node.setVelocity(v_C)
     
     absolute_v = tire_node.getVelocity()
     
-    abs_v = numpy.linalg.norm(absolute_v)
+    abs_v = absolute_v
     
     
     
     tire_node.setVelocity(v_C)# roll forward
     if absolute_v[0] != 0.0:
-        slip = numpy.arctan(abs_v[0]/absolute_v[0])
+        slip = numpy.arctan(absolute_v[1]/absolute_v[0])
     
     #print('slip \n', (slip))
    

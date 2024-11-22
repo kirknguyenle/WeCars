@@ -6,9 +6,10 @@ PROTO SingleSuspension [
   // Origin is the center of the wheel
   // this is just a snapshot of the suspension at a given ride height. 
   // this module is not suitable for simulating suspension with anti-roll bars, or other complex suspension systems.(No Mode Decoupled, No Active Suspesnion)
-  field SFFloat KnuckleHeight 0.134 // height of the knuckle (scalar from lower ball join to upper balljoint) in meters
-  field SFVec3f UpperBallJoint 0 0 0 // Upper ball joint relative to wheel center in meters
-  field SFVec3f LowerBallJoint 0 0 0 // Lower ball joint relative to wheel center in meters
+  field SFVec3f UpperBallJoint 0 0 0 // Upper ball joint relative to wheel center in meters [x,y,z]
+  field SFVec3f UpperBallJointRotation 0 0 0 // Upper ball joint rotation in radians [x,y,z]
+  field SFVec3f LowerBallJoint 0 0 0 // Lower ball joint relative to wheel center in meters [x,y,z]
+  field SFVec3f LowerBallJointRotation 0 0 0 // Lower ball joint rotation in radians [x,y,z]
   field SFFloat WheelRadius 0.2286 // Wheel radius in meters
   field SFFloat WheelWidth 0.1524 // Wheel width in meters
   field SFVec3f TieRodAttachmentPoint 0 0 0 // Tie rod attachment point relative to wheel center in meters
@@ -17,30 +18,32 @@ PROTO SingleSuspension [
   field SFFloat LowerArmLength 0.3048 // Length of the lower front link in meters
   field SFFloat UpperArmLength 0.3048 // Length of the upper front link in meters
   field SFVec3f UpperPickupPoint 0 0 0 // Upper front link pickup point relative to wheel center in meters
+  field SFVec3f UpperPickupRotation 0 0 0 // Upeer front link pickup point rotation in radians
   field SFVec3f LowerPickupPoint 0 0 0 // Lower front link pickup point relative to wheel center in meters
-
+  field SFVec3f LowerPickupRotation 0 0 0 // Lower front link pickup point rotation in radians
+  field boolean isSteerable  = true // is the suspension steerable
+  
   field boolean useMcphereson false // use Mcphereson strut instead of double wishbone
   field SFFloat McpheresonStrutLength 0.3048 // Length of the Mcphereson strut in meters
   field SFVec3f McpheresonStrutPickupPoint 0 0 0 // Mcphereson strut pickup point relative to wheel center in meters
 
   field SFFloat tireRadius 0.2286 // tire radius in meters
   field SFFloat tireWidth 0.1524 // tire width in meters
+  
 
 
   field boolean use_damper true // simulate damper
   field boolean use_spring true // simulate spring
   field SFFloat SpringRate 10000 // Spring rate in N/m
   field SFFloat SpringPreload 0 // Spring preload in meters
-  field SFFloat SpringFreeLength 0.3048 // Spring free length in meters
-  field SFFloat SpringDamping 1000 // Spring damping in N/m/s
+  field SFFloat DampingRate 1000 // Damping  ratein N/m/s
   field SFString name "Suspension" // Name of the suspension
-  field SFString controller "Suspension_controller" // Name of the controller
 
   field boolean flipRight false // flip the suspension to the left side of the car
 
 ]
 {
-  %<
+  
   import * as wbgeometry from 'wbgeometry.js';
   import * as wbrandom from 'wbrandom.js';
   import * as wbvector3 from 'wbvector3.js';
@@ -59,7 +62,7 @@ PROTO SingleSuspension [
   let LPP = fields.LowerPickupPoint.value;
   let TRPP = fields.TieRodPickupPoint.value;
   
- // set Mcphereson strut values
+  // set Mcphereson strut values
   let useMcphereson = fields.use_Mcphereson.value;
   let McpheresonStrutLength = fields.McpheresonStrutLength.value;
   let mCPP = fields.McpheresonStrutPickupPoint.value;
@@ -71,7 +74,7 @@ PROTO SingleSuspension [
   let SpringPreload = fields.SpringPreload.value;
   let SpringDamping = fields.SpringDamping.value;
   let flipRight = fields.flipRight.value;
-  >% 
+   
 
   DEF SingleSuspension Robot{
        

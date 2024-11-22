@@ -1,0 +1,39 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.6627490411007351 0.7446565156177986 0.07905935914245385 0.015099115563772155
+  position -0.23553332459829812 0.010289119948450066 0.004572492122716382
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Robot {
+  children [
+    DEF Suspension Solid {
+      children [
+        DEF Upright TouchSensor {
+          children [
+            BallJoint {
+              jointParameters BallJointParameters {
+                anchor 0 0.04 0.07
+              }
+              endPoint Solid {
+              }
+            }
+            Shape {
+              geometry Box {
+                size 0.01 0.08 0.14
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
