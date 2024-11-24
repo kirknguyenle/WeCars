@@ -9,18 +9,16 @@ DEF WorldData WorldInfo {
     DEF Contact1 ContactProperties {
       material1 "Ground"
       material2 "Tire1"
-      coulombFriction [
-        1000
-      ]
       forceDependentSlip [
-        0, 0
+        0, 0.08044829554914858
       ]
     }
   ]
 }
 DEF Camera Viewpoint {
-  orientation 0.3204952409227408 0.8499956022785585 0.41807927077646984 0.31299015915884026
-  position -1.1881048589484375 -0.253813627781041 -0.06738982054391802
+  orientation -0.12005055122134048 -0.1141121410366999 0.9861877531279085 4.569868846006899
+  position 0.2462115744730662 1.857653097871233 0.33737229536149005
+  follow "TireBot:solid:loadSensor"
 }
 TexturedBackground {
 }
@@ -33,12 +31,12 @@ DEF Ground RectangleArena {
   wallHeight 0.0001
 }
 DEF Tire Robot {
-  translation 6.207793403378516e-11 -7.843064389460278e-05 -0.3350640625176893
-  rotation 1 -1.7757524174852295e-11 1.7762133071705213e-11 1.5707842959282725
+  translation 0 0 -0.334489
+  rotation 1 0 0 1.57
   children [
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 313.37757206870043
+        position 313.37757210898445
         axis 0 0 1
       }
       device [
@@ -47,8 +45,12 @@ DEF Tire Robot {
         }
       ]
       endPoint DEF Wheel Solid {
+        translation 0 0 4.5744e-07
+        rotation 0.9999999999999997 0 0 0
         children [
           TouchSensor {
+            translation -8.737034630446061e-06 -8.737702533068159e-06 3.76133659751518e-07
+            rotation 0.6584832233199297 0.7511761772620805 0.046197351873487336 1.2308250111472538e-06
             children [
               DEF TreadShape Shape {
                 appearance Appearance {

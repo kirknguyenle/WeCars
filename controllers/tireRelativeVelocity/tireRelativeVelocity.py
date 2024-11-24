@@ -5,6 +5,10 @@ import numpy
 import math
 import os.path
 
+sys.path.append(r"C:\Users\quoca\OneDrive\Desktop\Motorsports\WeCars\extra_scripts")
+
+import transformations as tf
+
 run = datetime.now()
 
 runString= run.strftime("%d-%m-%Y-%H-%M-%S")
@@ -35,15 +39,15 @@ if tire_node == None:
     
 coulomb_friction = mc_node.getField("coulombFriction")
 sideslipConstant = mc_node.getField("forceDependentSlip")
-mass = p_node.getField("mass")
+
+
+mu = 1
+
+
+mf_var = [12.5664, 1.4, 0.714, 0.2] # Magic Formula parameters D,C,B,E
 
 
 
-
-mf_var = [100040, 1.4, 0.714, 0.2] # Magic Formula parameters D,C,B,E
-
-
-mu = 1000
 
 S = 0.0
 
@@ -52,9 +56,10 @@ coulomb_friction.setMFFloat(0,mu)
 sideslipConstant.setMFFloat(0, 0)
 sideslipConstant.setMFFloat(1, S)
 
-F_n = mass.getSFFloat()*mu
 
-k = 100040
+
+k = 12.5664
+
 
 
 
@@ -65,53 +70,74 @@ useMF = False
 
 v_x = 1
 
+rotationZ= numpy.array(tire_node.getOrientation()).reshape(3,3)
+tireForces = [[0],[0],[0]]
 while robot.step(TIME_STEP) != -1:
-
+    
     v_C = [v_x, 0, 0, 0, 0, 0]
     v_C[1] = v_C[1]+ i/1000
+    
     rotation = numpy.array(tire_node.getOrientation()).reshape(3,3)
+    
+    rotationZ[0][2] = rotation[0][2]
+    rotationZ[1][2] = rotation[1][2]
+    rotationZ[2][2] = rotation[2][2]
     r_i = numpy.linalg.inv(rotation)
+    r_iZ = numpy.linalg.inv(rotationZ)
+    velocity_raw = numpy.array(tire_node.getVelocity())
+    velocity = numpy.array([[velocity_raw[0]],[velocity_raw[1]],[velocity_raw[2]]])
+    velocity_local = numpy.matmul(r_iZ,velocity)
+
+    if (velocity_local[0] != 0.0):
+        slip = numpy.arctan(velocity_local[1]/velocity_local[0])
+    
+    #print ("velocity: \n", velocity, "\n")
+    #print("rotation matrix: \n", rotationZ, "\n")
+    #print("velocity local matrix: \n", velocity_local*10, "\n")
+    #print("slip angle: \n", numpy.degrees(slip), "\n")
     i +=1
-    tireForces = load.getValues()
-    print("force vector: \n", tireForces[2], "\n")
+    tireRaw = load.getValues()
+    tireForces[0] = tireRaw[0]
+    tireForces[1] = tireRaw[1]
+    tireForces[2] = tireRaw[2]
+    localTireVect = numpy.matmul(r_i,tireForces)
+    
+    print("force vector: \n",localTireVect, "\n")
   
   
-    v_l = numpy.array(v_C[0:3]) # Legacy code
-    v_r = numpy.dot(r_i,v_l) # Legacy Right Now
     
     
     
     
     tire_node.setVelocity(v_C)
     
-    absolute_v = tire_node.getVelocity()
     
-    abs_v = absolute_v
-    
+
     
     
     tire_node.setVelocity(v_C)# roll forward
-    if absolute_v[0] != 0.0:
-        slip = numpy.arctan(absolute_v[1]/absolute_v[0])
     
-    #print('slip \n', (slip))
+        
+    
+    
    
     #print('abs_vy \n', abs_vy)
    
     #print('lateral force \n', k*slip)
+    #print('slip \n', (slip))
     if slip != 0.0:
         if useMF:
             f_y = mf_var[0]*numpy.sin(mf_var[1]*numpy.arctan(mf_var[2]*slip-mf_var[3]*(mf_var[2]*slip-numpy.arctan(mf_var[2]*slip))))
-            S = numpy.tan(slip)*absolute_v[0]/(f_y)
+            S = numpy.tan(slip)*velocity_local[0]/(f_y)
             sideslipConstant.setMFFloat(1, S) 
-            print('MF dynamic \n',S)
+            #print('MF dynamic \n',S)
         else:
-            S = (numpy.tan(slip)*absolute_v[0])/(k*slip)
+            S = (numpy.tan(slip)*velocity_local[0])/(k*slip)
             sideslipConstant.setMFFloat(1, S) 
             #print('FDS dynamic \n',S)
     
    
-    file.write(str(i)+","+str(absolute_v[0])+","+str(k)+","+str(slip)+","+str(F_n)+","+str(S)+","+str(absolute_v[1])+"\r\n")
+    file.write(str(i)+","+str(velocity_local[0])+","+str(k)+","+str(slip)+","+str(S)+","+str(velocity_local[1])+"\r\n")
     
 file.close()
 
