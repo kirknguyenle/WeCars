@@ -102,7 +102,7 @@ while robot.step(TIME_STEP) != -1:
     tireForces[2] = tireRaw[2]
     localTireVect = numpy.matmul(r_i,tireForces)
     
-    print("force vector: \n",localTireVect, "\n")
+    print("force vector: \n",tireForces, "\n")
   
   
     
