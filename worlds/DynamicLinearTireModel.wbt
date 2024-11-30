@@ -20,7 +20,7 @@ DEF WorldData WorldInfo {
 }
 DEF Camera Viewpoint {
   orientation 0.22884173497129734 0.9635653469500917 -0.13846762254142994 0.6988589924683335
-  position -0.9883662710230374 0.041979932531104804 0.5171023387894025
+  position -1.6559700026626103 0.07407141743387934 1.0555197577228819
   follow "TireBot:solid"
 }
 TexturedBackground {
@@ -74,6 +74,6 @@ DEF Tire Robot {
   physics Physics {
     mass 1
   }
-  controller "tireRelativeVelocity"
+  controller "<none>"
   supervisor TRUE
 }

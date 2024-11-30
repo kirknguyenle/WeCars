@@ -4,6 +4,7 @@ import sys
 import numpy
 import math
 import os.path
+import transformations as tf
 
 
 run = datetime.now()
@@ -11,7 +12,7 @@ run = datetime.now()
 runString= run.strftime("%d-%m-%Y-%H-%M-%S")
 
 save_path = (r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\testData")
-filename = (r"tireRelativeVelocity" + runString)
+filename = (r"loadSmartTire" + runString)
 
 location = os.path.join(save_path, filename+".txt")
 print(location)
@@ -76,41 +77,30 @@ while robot.step(TIME_STEP) != -1:
     
     rotation = numpy.array(tire_node.getOrientation()).reshape(3,3)
     
-    rotationZ[0][2] = rotation[0][2]
-    rotationZ[1][2] = rotation[1][2]
-    rotationZ[2][2] = rotation[2][2]
-    r_i = numpy.linalg.inv(rotation)
-    r_iZ = numpy.linalg.inv(rotationZ)
+    eulerAngles = tf.getEulerAngles(rotation)
+    
     velocity_raw = numpy.array(tire_node.getVelocity())
     velocity = numpy.array([[velocity_raw[0]],[velocity_raw[1]],[velocity_raw[2]]])
-    velocity_local = numpy.matmul(r_iZ,velocity)
+    velocity_local = numpy.matmul(rotation,velocity)
 
-    if (velocity_local[0] != 0.0):
+    if (velocity_raw[0] != 0.0):
         slip = numpy.arctan(velocity_local[1]/velocity_local[0])
     
     #print ("velocity: \n", velocity, "\n")
     #print("rotation matrix: \n", rotationZ, "\n")
-    #print("velocity local matrix: \n", velocity_local*10, "\n")
+    #print ("euler angles: \n", numpy.degrees(eulerAngles), "\n")
     #print("slip angle: \n", numpy.degrees(slip), "\n")
     i +=1
     tireRaw = load.getValues()
     tireForces[0] = tireRaw[0]
     tireForces[1] = tireRaw[1]
     tireForces[2] = tireRaw[2]
-    localTireVect = numpy.matmul(r_i,tireForces)
+    localTireVect = numpy.matmul(rotation,tireForces)
     
-    print("force vector: \n",tireForces, "\n")
+    print("force vector: \n",localTireVect[2], "\n")
   
   
-    
-    
-    
-    
-    tire_node.setVelocity(v_C)
-    
-    
-
-    
+   
     
     tire_node.setVelocity(v_C)# roll forward
     

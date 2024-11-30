@@ -1,0 +1,70 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+
+WorldInfo {
+  contactProperties [
+    DEF Generic ContactProperties {
+    }
+    DEF Contact1 ContactProperties {
+      material1 "TireTread"
+      material2 "Ground"
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.09085316104317527 0.544320311113077 0.8339431047968597 0.39510492037623046
+  position -1.3716311485235657 -0.5058702837048672 0.4461989221333434
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+}
+DEF Wheel Robot {
+  translation 0 0 0.078
+  rotation 0 1 0 1.57
+  children [
+    TouchSensor {
+      children [
+        DEF TreadShape Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 1 1 1
+              transparency 0.9
+            }
+          }
+          geometry DEF TreadShape Cylinder {
+            height 0.0755
+            radius 0.0755
+          }
+        }
+      ]
+      name "loadSensor"
+      boundingObject USE TreadShape
+      physics DEF TreadPhysics Physics {
+        density 50
+      }
+      type "force-3d"
+    }
+    DEF TireShape Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0.333333 0.333333 0.498039
+        }
+      }
+      geometry Cylinder {
+        height 0.075
+        radius 0.075
+      }
+    }
+  ]
+  boundingObject USE TireShape
+  physics DEF TirePhysics Physics {
+    density 2000
+  }
+  supervisor TRUE
+}
