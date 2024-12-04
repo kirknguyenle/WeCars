@@ -57,7 +57,7 @@ sideslipConstant.setMFFloat(1, S)
 
 
 k = 10000
-
+r = 0.08
 
 
 
@@ -76,30 +76,29 @@ while robot.step(TIME_STEP) != -1:
     v_C[1] = v_C[0]+ i/1000
     
     rotation = numpy.array(tire_node.getOrientation()).reshape(3,3)
-    
-    eulerAngles = tf.getEulerAngles(rotation)
-    rotationZ = tf.create3DRotationAB((eulerAngles[1]),1)
+    euler = tf.getEulerAngles(rotation)
+    inv = numpy.transpose(rotation)
     velocity_raw = numpy.array(tire_node.getVelocity())
     velocity = numpy.array([[velocity_raw[0]],[velocity_raw[1]],[velocity_raw[2]]])
-    velocity_local = numpy.matmul(rotationZ,velocity)
-    
+    velocity_local = numpy.matmul(inv,velocity)
+    euler = tf.getEulerAngles(rotation)
+    #longitudinalVel = 
     if (velocity_raw[0] != 0.0):
         slip = numpy.arctan(velocity_local[1]/velocity_local[0])
-    
-    #print ("velocity: \n", velocity, "\n")
-    print("rotation matrix: \n", rotationZ, "\n")
-    print ("euler angles: \n", numpy.degrees(eulerAngles), "\n")
+    #print(xyrotate)
+    print ("Velocity X: \n", velocity_local,"\n")
+    print ("Velocity Y: \n", velocity_local[2],"\n")
     #print("slip angle: \n", numpy.degrees(slip), "\n")
     i +=1
     tireRaw = load.getValues()
     tireForces[0] = tireRaw[0]
     tireForces[1] = tireRaw[1]
     tireForces[2] = tireRaw[2]
-    localTireVect = numpy.matmul(rotationZ,tireForces)
-    print("force vector: \n",localTireVect[2], "\n")
-    print("rotated force vector: \n",
+    print("Force Z: \n",
           numpy.sqrt(numpy.power(tireRaw[0],2)+numpy.power(tireRaw[1],2)), 
           "\n")
+    print("Force Y: \n",tireForces[2],"\n")
+
   
   
    
@@ -117,12 +116,12 @@ while robot.step(TIME_STEP) != -1:
     if slip != 0.0:
         if useMF:
             f_y = mf_var[0]*numpy.sin(mf_var[1]*numpy.arctan(mf_var[2]*slip-mf_var[3]*(mf_var[2]*slip-numpy.arctan(mf_var[2]*slip))))
-            S = -1/numpy.tan(slip)*velocity_local[0]/(f_y)
+            S = numpy.tan(slip)*velocity_local[0]/(f_y)
             sideslipConstant.setMFFloat(1, S) 
             #print('MF dynamic \n',S)
         else:
             
-            S = -1/(numpy.tan(slip)*velocity_local[0])/(k*slip)
+            S = (numpy.tan(slip)*velocity_local[0])/(k*slip)
             sideslipConstant.setMFFloat(1, S) 
             #print('FDS dynamic \n',S)
     

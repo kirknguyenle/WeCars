@@ -23,7 +23,8 @@ def createEulerZYXRotation(roll,pitch,yaw):
     Ry = create3DRotationAB(pitch,1)
     Rx = create3DRotationAB(roll,0)
     return np.dot(Rx,Ry,Rz)
-
+def create2DRotation(theta):
+    return np.array([[np.cos(theta),np.sin(theta)],[-np.sin(theta),np.cos(theta)]])
 
 def arrayToMatrix(array):
     return np.array(array).reshape(3,3)
@@ -31,7 +32,17 @@ def arrayToMatrix(array):
 
 def getEulerAngles(array):
     """ Returns the Euler angles from a rotation matrix"""
-    x = np.arctan(array[2,1]/array[2,2])
-    y = -np.arcsin(array[2,0])
-    z = np.arctan(array[1,0]/array[0,0])
-    return np.array([x,y,z])
+    sy = np.sqrt(array[0,0] * array[0,0] +  array[1,0] * array[1,0])
+ 
+    singular = sy < 1e-6
+ 
+    if  not singular :
+        x = np.atan2(array[2,1] , array[2,2])
+        y = np.atan2(-array[2,0], sy)
+        z = np.atan2(array[1,0], array[0,0])
+    else :
+        x = np.atan2(-array[1,2], array[1,1])
+        y = np.atan2(-array[2,0], sy)
+        z = 0
+ 
+    return np.array([x, y, z])
