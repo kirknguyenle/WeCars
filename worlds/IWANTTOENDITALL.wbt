@@ -23,14 +23,15 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 RectangleArena {
+  floorSize 1 90
 }
 DEF Wheel Robot {
-  translation 6.370556278218925e-05 1.95317564370432e-18 0.07765608076207331
-  rotation -1.1036135090261654e-16 1 3.0794546528521353e-16 1.5707963201681727
+  translation 6.37061e-05 0 0.0789469
+  rotation -0.6883056207995047 0.2290649356384402 -0.6883056208086389 2.69123240937854
   children [
     TouchSensor {
-      translation -4.144835993982743e-05 7.884579552585957e-21 1.3668819562003866e-11
-      rotation 1.97758476261356e-16 1 3.0836964926006516e-13 1.4210854715202004e-14
+      translation -1.8145531758495537e-05 -2.6220449722558214e-06 1.3669449876489367e-11
+      rotation 1.1047521307900854e-09 -1.1691960050861738e-08 1 -1.2059425751331787e-06
       children [
         DEF TreadShape Shape {
           appearance Appearance {
@@ -48,14 +49,13 @@ DEF Wheel Robot {
       name "loadSensor"
       boundingObject USE TreadShape
       physics DEF TreadPhysics Physics {
+        density 20
       }
       type "force-3d"
       lookupTable [
         -50000 -50000 0
         50000 50000 0
       ]
-      linearVelocity 3.238486647554732e-09 8.331172329417671e-22 -1.1040354312746294e-07
-      angularVelocity -1.0416120556072078e-20 4.048747959573414e-08 -8.235860344618134e-29
     }
     DEF TireShape Shape {
       appearance Appearance {
@@ -74,6 +74,4 @@ DEF Wheel Robot {
   }
   controller "LoadSmartTire"
   supervisor TRUE
-  linearVelocity 3.2407607294164833e-09 8.328973348629355e-22 -1.3117589325049178e-06
-  angularVelocity -1.0416120789683902e-20 4.048755081963683e-08 -8.243858001815582e-29
 }
