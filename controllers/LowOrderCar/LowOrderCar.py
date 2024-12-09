@@ -22,6 +22,8 @@ timestep = int(robot.getBasicTimeStep())
 trackwidth = 2
 wheelbase = 6
 
+print (cO.createLocationString(1,-1)+"Drive")
+print (cO.createLocationString(-1,-1)+"Drive")
 
 mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"Contact"),
             robot.getFromDef(cO.createLocationString(-1,1)+"Contact")],
@@ -40,17 +42,33 @@ loads = [[robot.getDevice(cO.createLocationString(1,1)+"Force"),
 
 steeringRack = [robot.getDevice(cO.createLocationString(1,1)+"Steer"),
                 robot.getDevice(cO.createLocationString(-1,1)+"Steer")]
+steeringRackData = [[robot.getDevice(cO.createLocationString(1,1)+"SteerSensor"),
+                    robot.getDevice(cO.createLocationString(-1,1)+"SteerSensor")]]
 
-slipParams = [[mc_nodes[0,0].getField("forceDependentSlip"),
-               mc_nodes[0,1].getField("forceDependentSlip")],
-              [mc_nodes[1,0].getField("forceDependentSlip"),
-               mc_nodes[1,1].getField("forceDependentSlip")]]
+slipParams = [[mc_nodes[0][0].getField("forceDependentSlip"),
+               mc_nodes[0][1].getField("forceDependentSlip")],
+              [mc_nodes[1][0].getField("forceDependentSlip"),
+               mc_nodes[1][1].getField("forceDependentSlip")]]
+
+Drives = [[robot.getDevice(cO.createLocationString(1,-1)+"Drive"),robot.getDevice(cO.createLocationString(-1,-1)+"Drive")]]
 
 slip = [[0,0],[0,0]]
 
-AppliedTorque = 0
+steerAngle = 0
+
+AppliedTorque = -20
 
 while robot.step(timestep) != -1:
-    steerSensor = steeringRack[0].getPositionSensor()
+    steeringRackData[0][0].enable(timestep)
+    #print (steeringRackData[0][0].getValue())
+    ratio = cO.calculateDiffRatio(wheelbase,steeringRackData[0][0].getValue(), trackwidth)
+
+    torques = cO.simulateDifferential(AppliedTorque, ratio)
+    print(torques)   
+    Drives[0][0].setTorque(torques[0])
+    Drives[0][1].setTorque(torques[1])
+
+    #steeringRack[0].setPosition(steerAngle)
+    #steeringRack[1].setPosition(steerAngle)
+
     
-    ratio = cO.calculateDifferentialSpeeds

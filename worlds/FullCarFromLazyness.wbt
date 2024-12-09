@@ -5,52 +5,58 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
 
 WorldInfo {
+  CFM 1e-200
+  ERP 0.8
   contactProperties [
     DEF LeftRearContact ContactProperties {
       material1 "Ground"
       material2 "LeftRearContact"
       coulombFriction [
-        0, 1
+        1, 1
       ]
       forceDependentSlip [
         0, 0
       ]
+      softCFM 1e-200
     }
     DEF RightRearContact ContactProperties {
       material1 "Ground"
       material2 "RightRearContact"
       coulombFriction [
-        0, 1
+        1, 1
       ]
       forceDependentSlip [
         0, 0
       ]
+      softCFM 1e-200
     }
     DEF RightFrontContact ContactProperties {
       material1 "Ground"
       material2 "RightFrontContact"
       coulombFriction [
-        0, 1
+        1, 1
       ]
       forceDependentSlip [
         0, 0
       ]
+      softCFM 1e-200
     }
     DEF LeftFrontContact ContactProperties {
       material1 "Ground"
       material2 "LeftFrontContact"
       coulombFriction [
-        0, 1
+        1, 1
       ]
       forceDependentSlip [
         0, 0
       ]
+      softCFM 1e-200
     }
   ]
 }
 Viewpoint {
-  orientation 0.05060527536821162 0.016923476277658514 -0.9985753361943138 2.4953996782089063
-  position 16.69271961302652 19.003804029203764 2.182658992820383
+  orientation -0.20391523292640285 -0.051360208634146545 0.9776403770045651 3.6248584471705634
+  position 18.564639906267775 16.248261593229397 8.845877576990164
   follow "robot"
 }
 TexturedBackground {
@@ -58,18 +64,18 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 Robot {
-  translation -0.0026376356963188643 -0.0024511021580149754 0.22451531922477372
-  rotation -0.011744288753494831 -0.08061865444589089 -0.9966758270556223 0.001258303701706035
+  translation 0.07557995447928949 0.6381120954669804 0.2398663830533404
+  rotation -0.3726900036841631 0.26886548758310286 0.8881517385788303 0.01818795953743053
   children [
     DEF LeftRear SliderJoint {
       jointParameters JointParameters {
-        position 3.8858845305384506e-05
-        minStop -0.2
-        maxStop 0.2
+        position 0.037842075700194294
+        minStop -0.05
+        maxStop 0.05
         springConstant 90000
       }
       endPoint TouchSensor {
-        translation -1.3849644039125786 -2.9999982671842074 0.00024089444484449684
+        translation -1.3849644039125786 -2.9999982671842074 0.0380441112997334
         rotation 0 0 1 1.1128378546267656e-05
         children [
           DEF UprightShape Shape {
@@ -79,23 +85,27 @@ Robot {
           }
           DEF Steer+DriveJoint Hinge2Joint {
             jointParameters HingeJointParameters {
-              position -0.14403365120851525
+              position -1.8996148330055001e-06
               axis 0 0 1
               anchor 0.05 0.05 0
-              springConstant 100000
+              springConstant 900000000000
+              suspensionSpringConstant 9e+120
+              suspensionAxis 0 1 0
+              stopERP 0
             }
             jointParameters2 JointParameters {
-              position -0.0012546578025462267
+              position -236.96856718232607
               axis 1 0 0
             }
             device2 [
               RotationalMotor {
                 name "LeftRearDrive"
+                maxTorque 300
               }
             ]
             endPoint DEF LeftRearTire Solid {
-              translation -0.14520116151338863 0.027797630230297316 0.000109608531016379
-              rotation -0.00047874806955287895 0.9999983405296653 -0.0017577651155425346 1.575280826400967
+              translation -5.917881007386216e-07 0.058790647464012594 -0.049221529797635465
+              rotation -0.6835388791516186 0.2560252803583431 -0.6835390672855362 2.640328079550347
               children [
                 DEF TireShape Shape {
                   appearance Appearance {
@@ -109,11 +119,13 @@ Robot {
                   }
                 }
               ]
+              contactMaterial "LeftRearContact"
               boundingObject USE TireShape
               physics Physics {
+                density 100
               }
-              linearVelocity -8.496051701425904e-07 4.13685318844223e-05 4.517317914156707e-07
-              angularVelocity -0.00018443147907452973 2.5353676776906177e-05 -0.00010756695723305268
+              linearVelocity 0.0049070752119631115 -0.3471983771112528 0.0009611241480748191
+              angularVelocity 1.3615096386763554 0.019281826865216952 -0.00675735173845509
             }
           }
           GPS {
@@ -129,15 +141,15 @@ Robot {
           0 0 0
           50000 50000 0
         ]
-        linearVelocity 1.4616264854257507e-06 2.039662640187098e-05 -8.590566752447603e-06
-        angularVelocity -2.343683344250885e-08 -1.613859180268786e-06 -7.072333910319198e-07
+        linearVelocity 0.005815491091542267 -0.41459119198309097 -0.008079860598772186
+        angularVelocity -0.015486135224076589 -0.0029491680493984145 7.720588736405255e-05
       }
     }
     DEF RightRear SliderJoint {
       jointParameters JointParameters {
-        position 2.0056899682773064e-05
-        minStop -0.2
-        maxStop 0.2
+        position 0.0510364047328251
+        minStop -0.05
+        maxStop 0.05
         springConstant 90000
       }
       device [
@@ -146,7 +158,7 @@ Robot {
         }
       ]
       endPoint DEF Upright TouchSensor {
-        translation 1.385 -3 2.0056924165122544e-05
+        translation 1.385 -3 0.0510364047328251
         children [
           DEF UprightShape Shape {
             geometry Box {
@@ -155,23 +167,26 @@ Robot {
           }
           DEF Steer+DriveJoint Hinge2Joint {
             jointParameters HingeJointParameters {
-              position -3.4569488653966863e-06
+              position -1.898579554647118e-06
               axis 0 0 1
               anchor 0.05 0.05 0
-              springConstant 100000
+              springConstant 900000000000
+              suspensionSpringConstant 9e+120
+              suspensionAxis 0 1 0
             }
             jointParameters2 JointParameters {
-              position -0.002741044673245819
+              position -199.89897856056064
               axis 1 0 0
             }
             device2 [
               DEF RightRearDrive RotationalMotor {
-                name "RightRear"
+                name "RightRearDrive"
+                maxTorque 300
               }
             ]
             endPoint DEF RightRearTire Solid {
-              translation 0.13999982715266837 -1.2329206915823177e-07 0.00013705206207437228
-              rotation -0.0013698839613301783 0.9999981201715319 -0.0013722504635968343 1.5700018845674693
+              translation 2.181807793530388e-07 0.043807652994579574 -0.049635898363656686
+              rotation 0.2552989121557647 0.932545752433527 0.2553054740311499 1.640577672098567
               children [
                 DEF TireShape Shape {
                   appearance Appearance {
@@ -185,11 +200,13 @@ Robot {
                   }
                 }
               ]
+              contactMaterial "RightRearContact"
               boundingObject USE TireShape
               physics Physics {
+                density 100
               }
-              linearVelocity 1.318692707525378e-06 1.8317848129834763e-05 -3.0727465610135026e-06
-              angularVelocity -1.2474124354296927e-07 -1.6063827376969145e-06 -7.38718009534334e-07
+              linearVelocity 0.004910995763716059 -0.3469848603815702 0.008905893076877898
+              angularVelocity 1.360741968754285 0.019254094784295225 -0.00675324803739265
             }
           }
           DEF RightRearGPS GPS {
@@ -206,19 +223,19 @@ Robot {
           0 0 0
           50000 50000 0
         ]
-        linearVelocity 1.3294633466478745e-06 1.84117367910801e-05 -3.3319189212801156e-06
-        angularVelocity -1.250760845368852e-07 -1.605962288986014e-06 -7.406348873667197e-07
+        linearVelocity 0.005918158928232832 -0.4142613587791003 0.020275098970496824
+        angularVelocity -0.015486135121914713 -0.0029491679753182393 7.720571890674485e-05
       }
     }
     DEF LeftFront SliderJoint {
       jointParameters JointParameters {
-        position 1.944090347466565e-05
-        minStop -0.2
-        maxStop 0.2
+        position 0.050764317420729364
+        minStop -0.05
+        maxStop 0.05
         springConstant 90000
       }
       endPoint DEF Upright TouchSensor {
-        translation -1.385 3 1.944090347466565e-05
+        translation -1.385 3 0.050764317420729364
         children [
           DEF UprightShape Shape {
             geometry Box {
@@ -227,26 +244,31 @@ Robot {
           }
           DEF Steer+DriveJoint Hinge2Joint {
             jointParameters HingeJointParameters {
-              position -0.13322445638651506
+              position -2.852168275193449e-05
               axis 0 0 1
               anchor 0.05 0.05 0
             }
             jointParameters2 JointParameters {
-              position -0.009603050601380914
+              position 2.571011645248663
               axis 1 0 0
             }
             device [
-              RotationalMotor {
-                name "LeftFrontSteer"
+              DEF LeftFrontWheelSpeed PositionSensor {
+                name "LeftFrontWheelSpeed"
               }
             ]
             device2 [
-              DEF FrontLeftWheelSpeed PositionSensor {
+              PositionSensor {
+                name "LeftFrontSteerSensor"
+              }
+              RotationalMotor {
+                name "LeftFrontSteer"
+                maxTorque 300
               }
             ]
             endPoint DEF LeftFrontTire Solid {
-              translation -0.1449627125533683 0.02569557844283751 0.0005427997660805389
-              rotation -6.945350576332652e-05 0.9999999951758513 -6.94586772651677e-05 1.5708186218035058
+              translation 0.00708586498805934 0.10193434693451395 -0.021478824234986676
+              rotation 0.6021953140129722 -0.5242187723229814 0.6021258029058412 4.107075220379231
               children [
                 DEF TireShape Shape {
                   appearance Appearance {
@@ -260,11 +282,13 @@ Robot {
                   }
                 }
               ]
+              contactMaterial "LeftFrontContact"
               boundingObject USE TireShape
               physics Physics {
+                density 100
               }
-              linearVelocity 5.3950477559278515e-06 2.0508277457013505e-05 -3.0864411827899055e-06
-              angularVelocity -0.0001027171531663297 1.2385972834579779e-05 -6.618319178679786e-07
+              linearVelocity 0.005432461546381176 -0.3801187897223661 0.0031973495331200008
+              angularVelocity 1.4903908148214708 0.021304342032213146 -0.007036893602608733
             }
           }
           GPS {
@@ -280,19 +304,20 @@ Robot {
           0 0 0
           50000 50000 0
         ]
-        linearVelocity 5.435942794072474e-06 2.0340733505570687e-05 -8.092403677135652e-06
-        angularVelocity -1.674926892938567e-08 -1.534019157988259e-06 -6.491091858109997e-07
+        linearVelocity 0.005571539804304956 -0.41482080708225266 -0.07235044816441598
+        angularVelocity -0.01548613538100103 -0.002949168091681313 7.720552194550909e-05
       }
     }
     DEF RightFront SliderJoint {
       jointParameters JointParameters {
-        position 3.45986464437148e-05
-        minStop -0.2
-        maxStop 0.2
+        position 0.029520039716028807
+        minStop -0.05
+        maxStop 0.05
         springConstant 90000
       }
       endPoint DEF Upright TouchSensor {
-        translation 1.385 3 3.45986464437148e-05
+        translation 1.3849869821944423 3.0000028386191584 0.02952003972585865
+        rotation 0.4992909875832768 0.38709045629145794 -0.7751577183813544 1.5032490986331401e-12
         children [
           DEF UprightShape Shape {
             geometry Box {
@@ -301,26 +326,30 @@ Robot {
           }
           DEF Steer+DriveJoint Hinge2Joint {
             jointParameters HingeJointParameters {
-              position -0.12700467375563676
+              position 0.00012145320046318361
               axis 0 0 1
               anchor 0.05 0.05 0
             }
             jointParameters2 JointParameters {
-              position -0.000773148873532272
+              position -3.0782178881942635
               axis 1 0 0
             }
             device [
-              RotationalMotor {
-                name "LeftFrontSteer"
+              DEF RightFrontWheelSpeed PositionSensor {
+                name "RightFrontWheelSpeed"
               }
             ]
             device2 [
-              DEF FrontLeftWheelSpeed PositionSensor {
+              PositionSensor {
+                name "RightFrontSteerSensor"
+              }
+              RotationalMotor {
+                name "RightFrontSteer"
               }
             ]
             endPoint DEF RightFrontTire Solid {
-              translation 0.1329377678590276 -0.010985611762699805 9.427605530642806e-05
-              rotation -0.00037935924192350197 0.9999998556197828 -0.0003805876759278058 1.5741024675184256
+              translation 0.006729214025918362 0.10440989218765594 0.012930688818192138
+              rotation -0.5127573944960496 0.6889766712624201 -0.5122411549707594 1.9342098990913952
               children [
                 DEF TireShape Shape {
                   appearance Appearance {
@@ -334,11 +363,13 @@ Robot {
                   }
                 }
               ]
+              contactMaterial "LeftFrontContact"
               boundingObject USE TireShape
               physics Physics {
+                density 100
               }
-              linearVelocity 6.1904154218401025e-06 1.8120195487617714e-05 4.943781991273144e-07
-              angularVelocity -9.875095774695324e-05 1.1140979506476933e-05 -8.444940607647409e-07
+              linearVelocity 0.006367815013803648 -0.4335980433613646 0.006686357019771861
+              angularVelocity 1.699844184207118 0.02495530764881858 -0.009721516989339441
             }
           }
           GPS {
@@ -354,25 +385,28 @@ Robot {
           0 0 0
           50000 50000 0
         ]
-        linearVelocity 6.138866946011724e-06 1.8237014831145252e-05 -4.649149018210322e-06
-        angularVelocity -1.3313840909761556e-07 -1.5645120181087154e-06 -8.352762296438883e-07
+        linearVelocity 0.005568310148080359 -0.4152815705260303 -0.08594367466941293
+        angularVelocity -0.015486135418512778 -0.0029491680550145036 7.72055105716863e-05
       }
     }
     DEF CarShape Shape {
       appearance PBRAppearance {
       }
       geometry Box {
-        size 2.7 6 0.2
+        size 2.5 6 0.2
       }
     }
   ]
   boundingObject USE CarShape
   physics Physics {
-    mass 1
+    mass 1600
   }
-  linearVelocity 3.566045680256099e-06 1.9425496909679875e-05 -6.172060046929149e-06
-  angularVelocity -7.465725163161352e-08 -1.5795027660749575e-06 -7.328369490848647e-07
+  controller "LowOrderCar"
+  supervisor TRUE
+  linearVelocity 0.005914492438193085 -0.41530755900738825 -0.021972505158478466
+  angularVelocity -0.015486135340333943 -0.002949168102039733 7.720556058648612e-05
 }
 RectangleArena {
+  contactMaterial "Ground"
   floorSize 200 200
 }
