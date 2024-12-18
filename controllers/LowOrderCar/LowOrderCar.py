@@ -54,21 +54,22 @@ Drives = [[robot.getDevice(cO.createLocationString(1,-1)+"Drive"),robot.getDevic
 
 slip = [[0,0],[0,0]]
 
-steerAngle = 0
+steerAngle = np.radians(1.57/20)
 
-AppliedTorque = -20
+AppliedTorque = 0
+torques = [[0,0]]
 
 while robot.step(timestep) != -1:
     steeringRackData[0][0].enable(timestep)
     #print (steeringRackData[0][0].getValue())
-    ratio = cO.calculateDiffRatio(wheelbase,steeringRackData[0][0].getValue(), trackwidth)
+    ratio = cO.calculateDiffRatio(wheelbase,steerAngle, trackwidth)
 
     torques = cO.simulateDifferential(AppliedTorque, ratio)
     print(torques)   
-    Drives[0][0].setTorque(torques[0])
-    Drives[0][1].setTorque(torques[1])
+    #Drives[0][0].setTorque(torques[0][0])
+    #Drives[0][1].setTorque(torques[0][1])
 
-    #steeringRack[0].setPosition(steerAngle)
-    #steeringRack[1].setPosition(steerAngle)
+    steeringRack[0].setPosition(steerAngle)
+    steeringRack[1].setPosition(steerAngle)
 
     

@@ -2,7 +2,7 @@ import matplotlib.pyplot as mpl
 import numpy as np
 import math 
 
-v_x = 26.8224 #m/s
+v_x = 200 #m/s
 
 D = 20
 C = 1.4
