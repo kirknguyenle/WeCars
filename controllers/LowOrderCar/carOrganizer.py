@@ -6,20 +6,21 @@ def createLocationString(lateral, longitudinal):
     if (abs(lateral) != 1 & abs(longitudinal) != 1):
         raise Exception("Use only 1 or negative 1 for locations")
 
-    if (lateral < 0):
-        R = R+"Right"
-    else:
-        R = R+"Left"
+   
     if (longitudinal < 0):
         R = R+"Rear"
     else:
         R = R+"Front"
+    if (lateral < 0):
+        R = R+"Right"
+    else:
+        R = R+"Left"
     return R 
 
 def calculateDiffRatio(wheelbase,steeringAngle,trackwidth):
     if(steeringAngle == 0):
         return 0.5
-    rightRadius = wheelbase/(np.tan(steeringAngle)-trackwidth/2)
+    rightRadius = np.abs(wheelbase/(np.tan(steeringAngle)-trackwidth/2))
     leftRadius = wheelbase/(np.tan(steeringAngle)+trackwidth/2)
 
     return rightRadius/(leftRadius+rightRadius)

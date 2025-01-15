@@ -1,63 +1,40 @@
-#VRML_SIM R2023b utf8
+#VRML_SIM R2022a utf8
 # template language: javascript
-PROTO SingleSuspension [
-
-
-  // Dimension are done in ISO vehicle fixed coordinate system
-  // The values should come from the left side of the car, not the right side
-  // Origin is the center of the wheel
-  // this is just a snapshot of the suspension at a given ride height. 
-  // this module is not suitable for simulating suspension with anti-roll bars, or other complex suspension systems.(No Mode Decoupled, No Active Suspesnion)
-
+PROTO doubleWishbone[
   field SFString cornerName "frontleft"
-  field SFRotation cornerRotation 1 0 0 0 // For orientation purposes
-  field SFVec3f cornerPose 0 0 0 //For orientation purporses
-  field SFVec3f UpperBallJoint 0 0 0 // Upper ball joint relative to wheel center in meters [x,y,z]
-  field SFVec3f LowerBallJoint 0 0 0 // Lower ball joint relative to wheel center in meters [x,y,z]
-  field SFVec3f TieRodAttachmentPoint 0 0 0 // Tie rod attachment point relative to wheel center in meters
-  field SFVec3f TieRodPickupPoint 0 0 0 // Tie rod pickup point relative to wheel center in meters
-  field SFVec3f WheelAnchor 0 0 0 
-  field SFVec3f UpperFrontPickupPoint 0 0 0 // Upper front link pickup point relative to wheel center in meters
-  field SFVec3f UpperRearPickupPoint 0 0 0 // Upeer front link pickup point rotation in radians
-  field SFVec3f LowerFrontPickupPoint 0 0 0 // Lower front link pickup point relative to wheel center in meters
-  field SFVec3f LowerRearPickupPoint 0 0 0 // Lower front link pickup point rotation in radians
-  field boolean isSteerable  = true // is the suspension steerable
-  
-  field boolean useMcphereson false // use Mcphereson strut instead of double wishbone
-  field SFFloat McpheresonStrutLength 0.3048 // maximum length of the Mcphereson strut in meters
-  field SFVec3f McpheresonStrutPickupPoint 0 0 0 // Mcphereson strut pickup point relative to wheel center in meters
-
-  field SFFloat tireRadius 0.2286 // tire radius in meters
-  field SFFloat tireSectionWidth 0.1524 // tire width in meters
-  field SFFLoat wheelMass
-  
-
-
-  field boolean use_damper true // simulate damper
-  field boolean use_spring true // simulate spring
-  field SFFloat SpringRate 10000 // Spring rate in N/m
-  field SFFloat SpringPreload 0 // Spring preload in meters
-  field SFFloat DampingRate 1000 // Damping  ratein N/m/s
-  field SFString name "Suspension" // Name of the suspension
-
+  hiddenField SFString  steerMotorName "steer_left"
+  field SFRotation cornerRotation       1 0 0 0
+  field SFVec3f     cornerPose          0 0 0
+  field SFVec3f     LA_anchor_rear     -0.2 0 0
+  field SFVec3f     LA_anchor_front     0 0 0
+  field SFVec3f     UA_anchor_rear         -0.2 0 0.2
+  field SFVec3f     UA_anchor_front        0 0 0.2
+  field SFVec3f     tierod_anchor          -0.1 0 0.05
+  field SFVec3f     upright_tierod_anchor  -0.1 0.2 0.05
+  field SFVec3f     upright_LA_anchor 0 0.2 0
+  field SFVec3f     upright_UA_anchor 0 0.2 0.2
+  field SFVec3f     wheel_anchor      0 0.35 0.1
+  field SFFloat     tireRadius       0.25
+  field SFFloat     tireSectionWidth  0.2
+  field SFFloat     wheelSpringRate   5000
+  field SFFloat     wheelDampingRate  200
+  field SFFloat     wheelMass         20
 
 ]
 {
   #overall javascript calculations for proto-wide definitions
-  %< 
+  %<
+  //import webots geometry library so we can interpret fields
   import * as wbgeometry from 'wbgeometry.js';
-  //The vector based geometry generation and parts of the naming convention are borrowed from https://github.com/Alexanderallenbrown/ME377_DoubleWishbone
-  // Thank you for your help Doc. 
 
-  //creates naming convention strings:
-  
-  let cornerAnchorName = fields.cornerID.value+"_corner_anchor"
-  let cornerShapeName = fields.cornerID.value+"_corner_shape"
-  let steerRackName = fields.cornerID.value+"_steering_rack"
-  let steerMotorName = fields.cornerID.value;
-  let wheelName = fields.cornerID.value+"_wheel"
-  let contatctName = fields.cornerID.value+"_contact"
-  let suspensionMotorName = fields.cornerID.value+"suspension_motor"
+  //strings for naming convention
+  let cornerSolidName = fields.cornerName.value+"_corner_solid";
+  let cornerShapeName = fields.cornerName.value+"_corner_shape";
+  let steeringSliderName = fields.cornerName.value+"_steering_slider";
+  let steeringMotorName = fields.cornerName.value;//this one is defined specifically
+  let wheelName = fields.cornerName.value+"_wheel";
+  let contactName = fields.cornerName.value+"_tire_contact";
+  let suspensionMotorName = fields.cornerName.value+"_suspension_motor";
   let camberAngleSensorName = fields.cornerName.value+"_camberSensor";
   let steerAngleSensorName = fields.cornerName.value+"_steerSensor";
   let brakeName = fields.cornerName.value+"_brake";
@@ -66,42 +43,76 @@ PROTO SingleSuspension [
   let wheelForceSensorDEF;
   let tireShapeDEF;
   let driveMotorName = fields.cornerName.value+"_drive_motor";
-  // set SLA suspension values
-  let WR = fields.tireRadius.value;
-  let WW = fields.tireSectionWidth.value;
-  let TRAP = fields.TieRodAttachmentPoint.value;
-  let UFPP = fields.UpperFrontPickupPoint.value;
-  let URPP = fields.UpperRearPickupPoint.value; 
-  let LFPP = fields.LowerFrontPickupPoint.value;
-  let LRPP = field.LowerRearPickupPoint.value;
-  let TRPP = fields.TieRodPickupPoint.value;
-  
-  // set Mcphereson strut values
-  let useMcphereson = fields.use_Mcphereson.value;
-  let McpheresonStrutLength = fields.McpheresonStrutLength.value;
-  let mCPP = fields.McpheresonStrutPickupPoint.value;
 
-  //compute kp and kd for lower a arm motor based on desired spring/damping to simulate coilover
-  let wheelHinge = fields.WheelAnchor.value;
+  switch(fields.cornerName){
+    case "frontleft":
+      tireShapeDEF = "ts_shape_frontLeft";
+      steeringMotorName = "steer_left";
+      wheelForceSensorName = "flts";
+      wheelForceSensorDEF = "frontLeft_Wheel_forceSensor";
+      break
+    case "frontright":
+    tireShapeDEF = "ts_shape_frontRight";
+      steeringMotorName = "steer_right";
+      wheelForceSensorName = "frts";
+      wheelForceSensorDEF = "frontRight_Wheel_forceSensor";
+      break
+    case "rearleft":
+      tireShapeDEF = "ts_shape_rearLeft";
+      wheelForceSensorName = "rlts";
+      wheelForceSensorDEF = "rearLeft_Wheel_forceSensor";
+      break
+    case "rearright":
+      tireShapeDEF = "ts_shape_rearRight";
+      wheelForceSensorName = "rrts";
+      wheelForceSensorDEF = "rearRight_Wheel_forceSensor";
+      break
+    default:
+      tireShapeDEF = "ts_shape_frontLeft";
+      wheelForceSensorDEF = "Wheel_forceSensor";
+      wheelForceSensorName = "ts";
+      break
+  }
+
+
+
+
+
+  //front and rear a-arm axes and anchors
+  let uaf = fields.UA_anchor_front.value;
+  let uar = fields.UA_anchor_rear.value;
+  // console.log("uar: ",uar)
+  let laf = fields.LA_anchor_front.value;
+  let lar = fields.LA_anchor_rear.value;
+  let urtr = fields.upright_tierod_anchor.value;
+  // let mag_upper = Math.sqrt(Math.pow((uaf.x-uar.x),2)+Math.pow((uaf.y-uar.y),2)+Math.pow((uaf.z-uar.z),2));
+  let mag_upper = Math.sqrt(1)
+  console.log("upper a mag: ",mag_upper)
+  let axis_upper = {x: (uaf.x-uar.x)/mag_upper, y: (uaf.y-uar.y)/mag_upper, z: (uaf.z-uar.z)/mag_upper};
+  console.log("upper a axis: ",axis_upper)
+  let anchor_upper = {x: (uaf.x+uar.x)/2, y: (uaf.y+uar.y)/2, z: (uaf.z+uar.z)/2};
+  let mag_lower = Math.sqrt(Math.pow((laf.x-lar.x),2)+Math.pow((laf.y-lar.y),2)+Math.pow((laf.z-lar.z),2));
+  let axis_lower = {x: (laf.x-lar.x)/mag_lower, y: (laf.y-lar.y)/mag_lower, z: (laf.z-lar.z)/mag_lower};
+  let anchor_lower = {x: (laf.x+lar.x)/2, y: (laf.y+lar.y)/2, z: (laf.z+lar.z)/2};
+
+  //compute kp and kd for lower a arm motor based on desired spring/damping
+  let wheelHinge = fields.wheel_anchor.value;
   let wheelWidth = fields.tireSectionWidth.value;
   let wheelRadius = fields.tireRadius.value;
-  let Kwheel = fields.SpringRate.value;
-  let PreComp = fields.SpringPreload.value;
-  let Dwheel = fields.DampingRate.value;
-
+  let Kwheel = fields.wheelSpringRate.value;
+  let bwheel = fields.wheelSpringRate.value;
+  //the lever arm will give us an approximate transform between rotational and wheel rate
   let leverArm_y = wheelHinge.y+wheelWidth/2-anchor_lower.y
   console.log("wheelHinge: ",wheelHinge)
   console.log("wheelWidth: ",wheelWidth)
   console.log("anchor LA: ",anchor_lower)
   console.log("lever arm length: ",leverArm_y)
-  
   //now, Kwheel*z = F, and F*r = T. T/theta = Kp where theta = z/r so
   // Kwheel*(theta*r) = T/r so solve for T/theta
   // Kwheel*r^2 = T/theta = Kp
-  let Kp_LA = Kwheel*Math.pow(leverArm_y,2)+ Kwheel*PreComp
-  let Kd_LA = Dwheel*Math.pow(leverArm_y,2)
+  let Kp_LA = Kwheel*Math.pow(leverArm_y,2)
+  let Kd_LA = Kwheel*Math.pow(leverArm_y,2)
 
-  //Curtesy of Doc Brown:
   function spaceFrame(ptList,R,N){
     this.ptList = ptList;
     this.R = R;
@@ -127,207 +138,209 @@ PROTO SingleSuspension [
       }
     }
   }
-  
- 
+
   function rod(x1,y1,z1,x2,y2,z2, R, N ){
-    this.x1 = x1;
-    this.x2 = x2;
-    this.y1 = y1;
-    this.y2 = y2;
-    this.z1 = z1;
-    this.z2 = z2;
-    this.R = R;
-    this.N = N;
-    this.num_slices = 2;
-    this.vertices = []//this will hold all xyz points of the road
-    this.coordIndices = []//this is a list of triangles defined by the indices in the 'vertices' list.
-  
-    this.orthogonalVector = function(v) {
-      // Check for a zero vector
-      if (v.x === 0 && v.y === 0 && v.z === 0) {
-        throw new Error("Cannot find an orthogonal vector to a zero vector");
-      }
-      // Find a non-zero component of v
-      let nonZeroComponent = v.x !== 0 ? "x" : v.y !== 0 ? "y" : "z";
-      // Construct an orthogonal vector based on the non-zero component
-      switch (nonZeroComponent) {
-        case "x":
-          // console.log("x nonzero")
-          if(v.y!==0 && v.z!==0){
-            return { x: 0, y: v.z, z: -v.y };
-          }
-          else{
-            if(v.y===0){
-              return {x: 0, y: v.x, z: 0};
-            }
-            else{
-              return {x: 0, y: 0, z: v.x};
-            }
-          }
-        case "y":
-          // console.log("y nonzero")
-          if(v.x!==0 && v.z!== 0){
-            return { x: -v.z, y: 0, z: v.x };
-          }
-          else{
-            if(v.x===0){
-              return {x: v.y, y: 0, z: 0};
-            }
-            else{
-              return {x: 0, y: 0, z: v.y};
-            }
-          }
-        case "z":
-          // console.log("z nonzero")
-          if(v.y!==0 && v.x !== 0){
-            return { x: v.y, y: -v.x, z: 0 };
-          }
-          else{
-            if(v.x===0){
-              return {x: v.z, y: 0, z: 0};
-            }
-            else{
-              return {x: 0, y: v.z, z: 0};
-            }
-          }
-      }
+  this.x1 = x1;
+  this.x2 = x2;
+  this.y1 = y1;
+  this.y2 = y2;
+  this.z1 = z1;
+  this.z2 = z2;
+  this.R = R;
+  this.N = N;
+  this.num_slices = 2;
+  this.vertices = []//this will hold all xyz points of the road
+  this.coordIndices = []//this is a list of triangles defined by the indices in the 'vertices' list.
+
+  this.orthogonalVector = function(v) {
+    // Check for a zero vector
+    if (v.x === 0 && v.y === 0 && v.z === 0) {
+      throw new Error("Cannot find an orthogonal vector to a zero vector");
     }
-    //this function creates all slices in our rod
-    this.createVertices = function(){
-      let lengthvec = Math.sqrt(Math.pow(this.x2-this.x1,2)+Math.pow(this.y2-this.y1,2)+Math.pow(this.z2-this.z1,2));
-      let zvec = { x: (this.x2-this.x1)/lengthvec, y: (this.y2-this.y1)/lengthvec, z: (this.z2-this.z1)/lengthvec };
-      // console.log("length of local z vec: ",lengthvec)
-      let yvec = this.orthogonalVector(zvec);
-      let Ly = Math.sqrt(Math.pow(yvec.x,2)+Math.pow(yvec.y,2)+Math.pow(yvec.z,2));
-      // console.log("length of local y vec: ",Ly)
-      yvec.x = yvec.x/Ly;
-      yvec.y = yvec.y/Ly;
-      yvec.z = yvec.z/Ly;
-  
-      let xvec = {x: yvec.y*zvec.z - yvec.z*zvec.y, y: yvec.z*zvec.x-yvec.x*zvec.z , z: yvec.x*zvec.y-yvec.y*zvec.x};
-      let Lx = Math.sqrt(Math.pow(xvec.x,2)+Math.pow(xvec.y,2)+Math.pow(xvec.z,2));
-      // console.log("length of local x vec: ",Lx)
-      xvec.x = xvec.x/Lx;
-      xvec.y = xvec.y/Lx;
-      xvec.z = xvec.z/Lx;
-      // console.log("xvec: ",xvec)
-      // console.log("yvec: ",yvec)
-      // console.log("zvec: ",zvec)
-      // console.log("length: ",lengthvec)
-      //draw cross-section 1
-      let myslice = [];
-      for (let t = 0;t<2*3.14;t=t+6.28/N){
-        let xlocal = this.R*Math.cos(t);
-        let ylocal = this.R*Math.sin(t);
-        let zlocal = 0;
-        let myx = xlocal*xvec.x+ylocal*yvec.x+zlocal*zvec.x + this.x1
-        let myy = xlocal*xvec.y+ylocal*yvec.y+zlocal*zvec.y + this.y1
-        let myz = xlocal*xvec.z+ylocal*yvec.z+zlocal*zvec.z + this.z1
-        // console.log("point: ",myx,myy,myz);
-        myslice = myslice.concat([[myx,myy,myz]]);
-        // console.log(this.vertices);
-      }
-      this.vertices = this.vertices.concat(myslice);
-      myslice = [];
-      for (let t = 0;t<2*3.14;t=t+6.28/N){
-        let xlocal = this.R*Math.cos(t);
-        let ylocal = this.R*Math.sin(t);
-        let zlocal = lengthvec;
-        let myx = xlocal*xvec.x+ylocal*yvec.x+zlocal*zvec.x + this.x1
-        let myy = xlocal*xvec.y+ylocal*yvec.y+zlocal*zvec.y + this.y1
-        let myz = xlocal*xvec.z+ylocal*yvec.z+zlocal*zvec.z + this.z1
-        // console.log("point: ",myx,myy,myz);
-        myslice = myslice.concat([[myx,myy,myz]]);
-        // console.log(this.vertices);
-      }
-      this.vertices = this.vertices.concat(myslice);
-      this.vertices = this.vertices.concat([[this.x1,this.y1,this.z1]])
-      this.vertices = this.vertices.concat([[this.x2,this.y2,this.z2]])
-    }
-  
-    this.createTriangles = function(){
-      //first create vertices of our road using the function above.
-      this.createVertices();
-      //now, we have to define a list of triangles, defined by sets of three indices in our vertex array that are connected. like [0,1,2] would mean that vertices 0, 1, and 2 form a triangle.
-  
-      //outer for-loop that moves through each slice.
-      for(let slice_ind = 0;slice_ind<(this.num_slices-1);slice_ind++){
-        //inner for-loop that moves through each triangle in the slice.
-        //we will always make triangles from the current slice TO the next.
-        //for any point, triangle 1 is defined by 2 points on next slice, and this slice.
-        //for any point, triangle 2 is defined by this point, the point to the right, and then one point on the next slice.
-  
-        //first, the for-loop defining 'triangle 1' for each point (except the last one, which is only a member of triangle 2).
-        for(let point_ind = 0;point_ind<(this.N-1);point_ind++){
-          //offset the index based on which slice we're working on. on second slice (index 1), the total number of points in one slice must be added to get to the 0'th index for this slice.
-          let offsetThis = slice_ind*(this.N)
-          //same thing; find an offset that gets us to the same point in the NEXT slice
-          let offsetNext = (slice_ind+1)*(this.N)
-          //this triangle is me, me on the next slice, and neighbor on next slice.
-          //have to be defined in CCW order!
-          let tri = [offsetThis+point_ind,offsetNext+point_ind+1,offsetNext+point_ind]
-          this.coordIndices.push(tri)
-  
-        //now repeat this, but use the pattern: me, my neighbor, and my neighbor on the NEXT slice. This gets us full coverage.
-          //offset the index based on which slice we're working on. on second slice (index 1), the total number of points in one slice must be added to get to the 0'th index for this slice.
-          offsetThis = slice_ind*(this.N)
-          //same thing; find an offset that gets us to the same point in the NEXT slice
-          offsetNext = (slice_ind+1)*(this.N)
-          //this triangle is me, me on the next slice, and neighbor on next slice.
-          //have to be defined in CCW order!
-          tri = [offsetThis+point_ind,offsetThis+point_ind+1,offsetNext+point_ind+1]
-          this.coordIndices.push(tri)
+    // Find a non-zero component of v
+    let nonZeroComponent = v.x !== 0 ? "x" : v.y !== 0 ? "y" : "z";
+    // Construct an orthogonal vector based on the non-zero component
+    switch (nonZeroComponent) {
+      case "x":
+        // console.log("x nonzero")
+        if(v.y!==0 && v.z!==0){
+          return { x: 0, y: v.z, z: -v.y };
         }
-        //add last two triangles to close the loop
-        let tri = [0,this.N-1,2*(this.N)-1];
-        this.coordIndices.push(tri);
-        tri = [this.N,2*(this.N)-1,0];
-        this.coordIndices.push(tri);
-      }
-      //within-slice triangles:
-      for(let ind = 0; ind<(this.N-1);ind=ind+1){
-        let tri1 = [this.N*2,ind,ind+1]
-        let tri2 = [this.N*2+1,(this.N-1+ind),(this.N-1+ind)+1]
-        this.coordIndices.push(tri1);
-        this.coordIndices.push(tri2);
-      }
-  
-  
+        else{
+          if(v.y===0){
+            return {x: 0, y: v.x, z: 0};
+          }
+          else{
+            return {x: 0, y: 0, z: v.x};
+          }
+        }
+      case "y":
+        // console.log("y nonzero")
+        if(v.x!==0 && v.z!== 0){
+          return { x: -v.z, y: 0, z: v.x };
+        }
+        else{
+          if(v.x===0){
+            return {x: v.y, y: 0, z: 0};
+          }
+          else{
+            return {x: 0, y: 0, z: v.y};
+          }
+        }
+      case "z":
+        // console.log("z nonzero")
+        if(v.y!==0 && v.x !== 0){
+          return { x: v.y, y: -v.x, z: 0 };
+        }
+        else{
+          if(v.x===0){
+            return {x: v.z, y: 0, z: 0};
+          }
+          else{
+            return {x: 0, y: v.z, z: 0};
+          }
+        }
     }
-  
+  }
+  //this function creates all slices in our rod
+  this.createVertices = function(){
+    let lengthvec = Math.sqrt(Math.pow(this.x2-this.x1,2)+Math.pow(this.y2-this.y1,2)+Math.pow(this.z2-this.z1,2));
+    let zvec = { x: (this.x2-this.x1)/lengthvec, y: (this.y2-this.y1)/lengthvec, z: (this.z2-this.z1)/lengthvec };
+    // console.log("length of local z vec: ",lengthvec)
+    let yvec = this.orthogonalVector(zvec);
+    let Ly = Math.sqrt(Math.pow(yvec.x,2)+Math.pow(yvec.y,2)+Math.pow(yvec.z,2));
+    // console.log("length of local y vec: ",Ly)
+    yvec.x = yvec.x/Ly;
+    yvec.y = yvec.y/Ly;
+    yvec.z = yvec.z/Ly;
+
+    let xvec = {x: yvec.y*zvec.z - yvec.z*zvec.y, y: yvec.z*zvec.x-yvec.x*zvec.z , z: yvec.x*zvec.y-yvec.y*zvec.x};
+    let Lx = Math.sqrt(Math.pow(xvec.x,2)+Math.pow(xvec.y,2)+Math.pow(xvec.z,2));
+    // console.log("length of local x vec: ",Lx)
+    xvec.x = xvec.x/Lx;
+    xvec.y = xvec.y/Lx;
+    xvec.z = xvec.z/Lx;
+    // console.log("xvec: ",xvec)
+    // console.log("yvec: ",yvec)
+    // console.log("zvec: ",zvec)
+    // console.log("length: ",lengthvec)
+    //draw cross-section 1
+    let myslice = [];
+    for (let t = 0;t<2*3.14;t=t+6.28/N){
+      let xlocal = this.R*Math.cos(t);
+      let ylocal = this.R*Math.sin(t);
+      let zlocal = 0;
+      let myx = xlocal*xvec.x+ylocal*yvec.x+zlocal*zvec.x + this.x1
+      let myy = xlocal*xvec.y+ylocal*yvec.y+zlocal*zvec.y + this.y1
+      let myz = xlocal*xvec.z+ylocal*yvec.z+zlocal*zvec.z + this.z1
+      // console.log("point: ",myx,myy,myz);
+      myslice = myslice.concat([[myx,myy,myz]]);
+      // console.log(this.vertices);
+    }
+    this.vertices = this.vertices.concat(myslice);
+    myslice = [];
+    for (let t = 0;t<2*3.14;t=t+6.28/N){
+      let xlocal = this.R*Math.cos(t);
+      let ylocal = this.R*Math.sin(t);
+      let zlocal = lengthvec;
+      let myx = xlocal*xvec.x+ylocal*yvec.x+zlocal*zvec.x + this.x1
+      let myy = xlocal*xvec.y+ylocal*yvec.y+zlocal*zvec.y + this.y1
+      let myz = xlocal*xvec.z+ylocal*yvec.z+zlocal*zvec.z + this.z1
+      // console.log("point: ",myx,myy,myz);
+      myslice = myslice.concat([[myx,myy,myz]]);
+      // console.log(this.vertices);
+    }
+    this.vertices = this.vertices.concat(myslice);
+    this.vertices = this.vertices.concat([[this.x1,this.y1,this.z1]])
+    this.vertices = this.vertices.concat([[this.x2,this.y2,this.z2]])
   }
 
-  var myUBJ = fields.UpperBallJoint.value;
-  var myLBJ = fields.LowerBallJoint.value;
+  this.createTriangles = function(){
+    //first create vertices of our road using the function above.
+    this.createVertices();
+    //now, we have to define a list of triangles, defined by sets of three indices in our vertex array that are connected. like [0,1,2] would mean that vertices 0, 1, and 2 form a triangle.
 
-  //create a rod object for upright using the proto fields
-  var myUpright = new rod(myUBJ.x, myUBJ.y,myUBJ.z,myLBJ.x,myLBJ.y,myLBJ.z,0.005,10);
-  myUpright.createTriangles();
-  
-  //create a rod object for the tie rod
-  var tieIn = fields.tierod_anchor.value;
-  var tieOut = fields.upright_tierod_anchor.value;
-  var tieRod = new rod(TRPP.x,TRPP.y,TRPP.z,TRAP.x,TRAP.y,TRAP.z,0.005,10);
-  tieRod.createTriangles();
- 
-  // //create a space frame for the upper a-arm
-  // let ua_pts = [[0,0,0],[0,1,0],[0,0,1]]
-  let ua_pts = [[URPP.x,URPP.y,URPP.z],[myUBJ.x,myUBJ.y,myUBJ.z],[UFPP.x,UFPP.y,UFPP.z]]
-  var UA = new spaceFrame(ua_pts,0.01,4)
-  UA.createTriangles();//THIS IS CAUSING ERROR
+    //outer for-loop that moves through each slice.
+    for(let slice_ind = 0;slice_ind<(this.num_slices-1);slice_ind++){
+      //inner for-loop that moves through each triangle in the slice.
+      //we will always make triangles from the current slice TO the next.
+      //for any point, triangle 1 is defined by 2 points on next slice, and this slice.
+      //for any point, triangle 2 is defined by this point, the point to the right, and then one point on the next slice.
 
-  let la_pts = [[LRPP.x,LRPP.y,LRPP.z],[myLBJ.x,myLBJ.y,myLBJ.z],[LFPP.x,LFPP.y,LFPP.z]]
-  var LA = new spaceFrame(la_pts,0.01,4)
-  LA.createTriangles();
-  // console.log("la pts: ",la_pts)
-  // let UA = tieRod;
-  // let LA = tieRod;
+      //first, the for-loop defining 'triangle 1' for each point (except the last one, which is only a member of triangle 2).
+      for(let point_ind = 0;point_ind<(this.N-1);point_ind++){
+        //offset the index based on which slice we're working on. on second slice (index 1), the total number of points in one slice must be added to get to the 0'th index for this slice.
+        let offsetThis = slice_ind*(this.N)
+        //same thing; find an offset that gets us to the same point in the NEXT slice
+        let offsetNext = (slice_ind+1)*(this.N)
+        //this triangle is me, me on the next slice, and neighbor on next slice.
+        //have to be defined in CCW order!
+        let tri = [offsetThis+point_ind,offsetNext+point_ind+1,offsetNext+point_ind]
+        this.coordIndices.push(tri)
+
+      //now repeat this, but use the pattern: me, my neighbor, and my neighbor on the NEXT slice. This gets us full coverage.
+        //offset the index based on which slice we're working on. on second slice (index 1), the total number of points in one slice must be added to get to the 0'th index for this slice.
+        offsetThis = slice_ind*(this.N)
+        //same thing; find an offset that gets us to the same point in the NEXT slice
+        offsetNext = (slice_ind+1)*(this.N)
+        //this triangle is me, me on the next slice, and neighbor on next slice.
+        //have to be defined in CCW order!
+        tri = [offsetThis+point_ind,offsetThis+point_ind+1,offsetNext+point_ind+1]
+        this.coordIndices.push(tri)
+      }
+      //add last two triangles to close the loop
+      let tri = [0,this.N-1,2*(this.N)-1];
+      this.coordIndices.push(tri);
+      tri = [this.N,2*(this.N)-1,0];
+      this.coordIndices.push(tri);
+    }
+    //within-slice triangles:
+    for(let ind = 0; ind<(this.N-1);ind=ind+1){
+      let tri1 = [this.N*2,ind,ind+1]
+      let tri2 = [this.N*2+1,(this.N-1+ind),(this.N-1+ind)+1]
+      this.coordIndices.push(tri1);
+      this.coordIndices.push(tri2);
+    }
+
+
+  }
+
+}
+
+//create a rod object by using the proto fields
+var myUBJ = fields.upright_UA_anchor.value;
+var myLBJ = fields.upright_LA_anchor.value;
+// console.log("UBJ: ",myUBJ)
+// console.log("LBJ: ",myLBJ)
+var myUpright = new rod(myUBJ.x, myUBJ.y,myUBJ.z,myLBJ.x,myLBJ.y,myLBJ.z,0.005,10);
+myUpright.createTriangles();
+
+//create a rod object for the tie rod
+var tieIn = fields.tierod_anchor.value;
+var tieOut = fields.upright_tierod_anchor.value;
+var tieRod = new rod(tieIn.x,tieIn.y,tieIn.z,tieOut.x,tieOut.y,tieOut.z,0.005,10);
+tieRod.createTriangles();
+// console.log("tie rod triangles: ",tieRod.vertices.length)
+// console.log("tie rod coordinates: ",tieRod.coordIndices.length)
+
+// //create a space frame for the upper a-arm
+// let ua_pts = [[0,0,0],[0,1,0],[0,0,1]]
+let ua_pts = [[uar.x,uar.y,uar.z],[myUBJ.x,myUBJ.y,myUBJ.z],[uaf.x,uaf.y,uaf.z]]
+var UA = new spaceFrame(ua_pts,0.01,4)
+UA.createTriangles();//THIS IS CAUSING ERROR
+//
+// //create a space frame for the lower a-arm
+let la_pts = [[lar.x,lar.y,lar.z],[myLBJ.x,myLBJ.y,myLBJ.z],[laf.x,laf.y,laf.z]]
+var LA = new spaceFrame(la_pts,0.01,4)
+LA.createTriangles();
+// console.log("la pts: ",la_pts)
+// let UA = tieRod;
+// let LA = tieRod;
 
   >%
-
-  DEF %<=cornerAnchorName>% Solid{ #this solid is the "mount" for the corner
+  DEF %<=cornerSolidName>% Solid{ #this solid is the "mount" for the corner
     children[
-      DEF %<=steerRackName>% SliderJoint{
+      DEF %<=steeringSliderName>% SliderJoint{
         jointParameters JointParameters{
           axis 0 1 0
         }
@@ -342,7 +355,7 @@ PROTO SingleSuspension [
           children [
             BallJoint {
               jointParameters BallJointParameters {
-                anchor IS TRPP
+                anchor IS tierod_anchor
                 staticFriction 1
               }
               endPoint DEF tierod Solid {
@@ -620,11 +633,3 @@ PROTO SingleSuspension [
     }
   }#end corner solid
 }#end proto
-
-
-
-
-
-
-
-
