@@ -2,7 +2,7 @@
 Wecars is an add on package to the Webots Robotics Simulation Software. It enables higher fidelity vehicle dynamics simulation than offered in Webots by default.
 The goal of this package is to increase the accesiblity of vehicle dynamics simulation, as well as vehicle dynamics in general more accessible. 
 Almost all modern software packages are either prohibitively expensive, unmaintained, or otherwise inacessible. In addition, information on the 
-steady state and dynamic stabilty of automotive vehicles not widely understood, but frequently misquoted and misunderstood. This software package 
+steady state and dynamic stabilty of automotive vehicles are not widely understood yet frequently misquoted and misunderstood. This software package 
 intends to allow individuals to gain understanding through visualization and simulation in tandem the fundamental physics.
 ## Features: 
 1) Real time simulation of Double Wishbone and Mcpherson Strut suspension behavior. (Trailing Arm, Semi Trailing Arm, and Multilink are planned) 
