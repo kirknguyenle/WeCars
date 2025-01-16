@@ -1,45 +1,27 @@
 #VRML_SIM R2023b utf8
 # template language: javascript
-PROTO SingleSuspension [
-
-
-  // Dimension are done in ISO vehicle fixed coordinate system
-  // The values should come from the left side of the car, not the right side
-  // Origin is the center of the wheel
-  // this is just a snapshot of the suspension at a given ride height. 
-  // this module is not suitable for simulating suspension with anti-roll bars, or other complex suspension systems.(No Mode Decoupled, No Active Suspesnion)
-
-  field SFString cornerName "frontleft"
-  field SFRotation cornerRotation 1 0 0 0 // For orientation purposes
-  field SFVec3f cornerPose 0 0 0 //For orientation purporses
-  field SFVec3f UpperBallJoint 0 0 0 // Upper ball joint relative to wheel center in meters [x,y,z]
-  field SFVec3f LowerBallJoint 0 0 0 // Lower ball joint relative to wheel center in meters [x,y,z]
-  field SFVec3f TieRodAttachmentPoint 0 0 0 // Tie rod attachment point relative to wheel center in meters
-  field SFVec3f TieRodPickupPoint 0 0 0 // Tie rod pickup point relative to wheel center in meters
-  field SFVec3f WheelAnchor 0 0 0 
-  field SFVec3f UpperFrontPickupPoint 0 0 0 // Upper front link pickup point relative to wheel center in meters
-  field SFVec3f UpperRearPickupPoint 0 0 0 // Upeer front link pickup point rotation in radians
-  field SFVec3f LowerFrontPickupPoint 0 0 0 // Lower front link pickup point relative to wheel center in meters
-  field SFVec3f LowerRearPickupPoint 0 0 0 // Lower front link pickup point rotation in radians
-  field boolean isSteerable  = true // is the suspension steerable
-  
-  field boolean useMcphereson false // use Mcphereson strut instead of double wishbone
-  field SFFloat McpheresonStrutLength 0.3048 // maximum length of the Mcphereson strut in meters
-  field SFVec3f McpheresonStrutPickupPoint 0 0 0 // Mcphereson strut pickup point relative to wheel center in meters
-
-  field SFFloat tireRadius 0.2286 // tire radius in meters
-  field SFFloat tireSectionWidth 0.1524 // tire width in meters
-  field SFFLoat wheelMass
-  
-
-
-  field boolean use_damper true // simulate damper
-  field boolean use_spring true // simulate spring
-  field SFFloat SpringRate 10000 // Spring rate in N/m
-  field SFFloat SpringPreload 0 // Spring preload in meters
-  field SFFloat DampingRate 1000 // Damping  ratein N/m/s
-  field SFString name "Suspension" // Name of the suspension
-
+PROTO singleSuspension [
+  field SFString cornerID "frontleft"
+  hiddenField SFString  steerMotorName "steer_left"
+  field SFRotation cornerRotation 1 0 0 0 
+  field SFVec3f cornerPose 0 0 0 
+  field SFVec3f LowerRearPickupPoint -0.2 0 0 
+  field SFVec3f LowerFrontPickupPoint 0 0 0 
+  field SFVec3f UpperRearPickupPoint -0.2 0 0.2 
+  field SFVec3f UpperFrontPickupPoint  0 0 0.2 
+  field SFVec3f TieRodPickupPoint  -0.1 0 0.05 
+  field SFVec3f TieRodAttachmentPoint -0.1 0.2 0.05 
+  field SFVec3f LowerBallJoint 0 0.2 0 
+  field SFVec3f UpperBallJoint 0 0.2 0.2
+  field SFVec3f WheelAnchor 0 0.35 0.1 
+  field SFFloat tireRadius 0.25 
+  field SFFloat tireSectionWidth 0.2 
+  field SFFloat SpringRate 5000 
+  field SFFloat SpringPreload 0.001 
+  field SFFloat DampingRate 200 
+  field SFFloat wheelMass 20
+  field SFBool useMcphereson TRUE 
+  field SFVec3f McpheresonStrutPickupPoint 0 0.1 0.5 
 
 ]
 {
@@ -50,36 +32,78 @@ PROTO SingleSuspension [
   // Thank you for your help Doc. 
 
   //creates naming convention strings:
-  
-  let cornerAnchorName = fields.cornerID.value+"_corner_anchor"
-  let cornerShapeName = fields.cornerID.value+"_corner_shape"
-  let steerRackName = fields.cornerID.value+"_steering_rack"
-  let steerMotorName = fields.cornerID.value;
-  let wheelName = fields.cornerID.value+"_wheel"
-  let contatctName = fields.cornerID.value+"_contact"
-  let suspensionMotorName = fields.cornerID.value+"suspension_motor"
-  let camberAngleSensorName = fields.cornerName.value+"_camberSensor";
-  let steerAngleSensorName = fields.cornerName.value+"_steerSensor";
-  let brakeName = fields.cornerName.value+"_brake";
-  let wheelEncoderName = fields.cornerName.value+"_encoder";
+  let cornerAnchorName = fields.cornerID.value+"_corner_anchor";
+  let cornerShapeName = fields.cornerID.value+"_corner_shape";
+  let steerRackName = fields.cornerID.value+"_steering_rack";
+  let steeringMotorName = fields.cornerID.value;
+  let wheelName = fields.cornerID.value+"_wheel";
+  let contactName = fields.cornerID.value+"_contact";
+  let suspensionMotorName = fields.cornerID.value+"_suspension_motor";
+  let camberAngleSensorName = fields.cornerID.value+"_camberSensor";
+  let steerAngleSensorName = fields.cornerID.value+"_steerSensor";
+  let brakeName = fields.cornerID.value+"_brake";
+  let wheelEncoderName = fields.cornerID.value+"_encoder";
   let wheelForceSensorName;
   let wheelForceSensorDEF;
   let tireShapeDEF;
-  let driveMotorName = fields.cornerName.value+"_drive_motor";
-  // set SLA suspension values
-  let WR = fields.tireRadius.value;
-  let WW = fields.tireSectionWidth.value;
+  let driveMotorName = fields.cornerID.value+"_drive_motor";
+
+
+
+    switch(fields.cornerID){
+    case "frontleft":
+      tireShapeDEF = "ts_shape_frontLeft";
+      steeringMotorName = "steer_left";
+      wheelForceSensorName = "flts";
+      wheelForceSensorDEF = "frontLeft_Wheel_forceSensor";
+      break
+    case "frontright":
+    tireShapeDEF = "ts_shape_frontRight";
+      steeringMotorName = "steer_right";
+      wheelForceSensorName = "frts";
+      wheelForceSensorDEF = "frontRight_Wheel_forceSensor";
+      break
+    case "rearleft":
+      tireShapeDEF = "ts_shape_rearLeft";
+      wheelForceSensorName = "rlts";
+      wheelForceSensorDEF = "rearLeft_Wheel_forceSensor";
+      break
+    case "rearright":
+      tireShapeDEF = "ts_shape_rearRight";
+      wheelForceSensorName = "rrts";
+      wheelForceSensorDEF = "rearRight_Wheel_forceSensor";
+      break
+    default:
+      tireShapeDEF = "ts_shape_frontLeft";
+      wheelForceSensorDEF = "Wheel_forceSensor";
+      wheelForceSensorName = "ts";
+      break
+  }
+  
+    // set SLA suspension values
   let TRAP = fields.TieRodAttachmentPoint.value;
   let UFPP = fields.UpperFrontPickupPoint.value;
   let URPP = fields.UpperRearPickupPoint.value; 
-  let LFPP = fields.LowerFrontPickupPoint.value;
-  let LRPP = field.LowerRearPickupPoint.value;
+  let LFPP = fields.LowerFrontPickupPoint.value;  
+  let LRPP = fields.LowerRearPickupPoint.value;
   let TRPP = fields.TieRodPickupPoint.value;
-  
+  let ubj = fields.UpperBallJoint.value;
+  console.log("URPP: ", URPP)
+
   // set Mcphereson strut values
-  let useMcphereson = fields.use_Mcphereson.value;
-  let McpheresonStrutLength = fields.McpheresonStrutLength.value;
+  let useMcphereson = fields.useMcphereson.value;
   let mCPP = fields.McpheresonStrutPickupPoint.value;
+    // let mag_upper = Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP,2));
+    let mag_upper = Math.sqrt(1)
+    console.log("upper a mag: ",mag_upper)
+    let axis_upper = {x: (UFPP.x-URPP.x)/mag_upper, y: (UFPP.y-URPP.y)/mag_upper, z: (UFPP.z-URPP.z)/mag_upper};
+    console.log("upper a axis: ",axis_upper)
+    let anchor_upper = {x: (UFPP.x+URPP.x)/2, y: (UFPP.y+URPP.y)/2, z: (UFPP.z+URPP.z)/2};
+    let mag_lower = Math.sqrt(Math.pow((LFPP.x-LRPP.x),2)+Math.pow((LFPP.y-LRPP.y),2)+Math.pow((LFPP.z-LRPP.z),2));
+    let axis_lower = {x: (LFPP.x-LRPP.x)/mag_lower, y: (LFPP.y-LRPP.y)/mag_lower, z: (LFPP.z-LRPP.z)/mag_lower};
+    let anchor_lower = {x: (LFPP.x+LRPP.x)/2, y: (LFPP.y+LRPP.y)/2, z: (LFPP.z+LRPP.z)/2};
+    let mag_strut = Math.sqrt(Math.pow(mCPP.x-ubj.x,2)+Math.pow(mCPP.y-ubj.y,2)+Math.pow(mCPP.z-ubj.z,2))
+    let axis_strut = {x:(mCPP.x-ubj.x)/mag_strut, y: (mCPP.y-ubj.y)/mag_strut, z:(mCPP.z-ubj.z)/mag_strut }
 
   //compute kp and kd for lower a arm motor based on desired spring/damping to simulate coilover
   let wheelHinge = fields.WheelAnchor.value;
@@ -98,7 +122,7 @@ PROTO SingleSuspension [
   //now, Kwheel*z = F, and F*r = T. T/theta = Kp where theta = z/r so
   // Kwheel*(theta*r) = T/r so solve for T/theta
   // Kwheel*r^2 = T/theta = Kp
-  let Kp_LA = Kwheel*Math.pow(leverArm_y,2)+ Kwheel*PreComp
+  let Kp_LA = Kwheel*Math.pow(leverArm_y,2)
   let Kd_LA = Dwheel*Math.pow(leverArm_y,2)
 
   //Curtesy of Doc Brown:
@@ -305,11 +329,14 @@ PROTO SingleSuspension [
   myUpright.createTriangles();
   
   //create a rod object for the tie rod
-  var tieIn = fields.tierod_anchor.value;
-  var tieOut = fields.upright_tierod_anchor.value;
-  var tieRod = new rod(TRPP.x,TRPP.y,TRPP.z,TRAP.x,TRAP.y,TRAP.z,0.005,10);
+  var tieIn = fields.TieRodPickupPoint.value;
+  var tieOut = fields.TieRodAttachmentPoint.value;
+  var tieRod = new rod(tieIn.x,tieIn.y,tieIn.z,tieOut.x,tieOut.y,tieOut.z,0.005,10);
   tieRod.createTriangles();
  
+  var strut = new rod(mCPP.x, mCPP.y, mCPP.z, myUBJ.x, myUBJ.y, myUBJ.z, 0.005, 10);
+  strut.createTriangles();
+  
   // //create a space frame for the upper a-arm
   // let ua_pts = [[0,0,0],[0,1,0],[0,0,1]]
   let ua_pts = [[URPP.x,URPP.y,URPP.z],[myUBJ.x,myUBJ.y,myUBJ.z],[UFPP.x,UFPP.y,UFPP.z]]
@@ -342,7 +369,7 @@ PROTO SingleSuspension [
           children [
             BallJoint {
               jointParameters BallJointParameters {
-                anchor IS TRPP
+                anchor IS TieRodPickupPoint
                 staticFriction 1
               }
               endPoint DEF tierod Solid {
@@ -399,48 +426,91 @@ PROTO SingleSuspension [
           size .01 .01 .01
         }
       }
-
-      DEF UA_inner HingeJoint {
-        jointParameters HingeJointParameters {
-          anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
-        }
-        endPoint DEF UA_solid Solid {
-          children [
-            BallJoint {
-              jointParameters BallJointParameters {
-                staticFriction 1
-              }
-              endPoint SolidReference {
-              }
-            }
-            DEF UA_shape Shape {
-              appearance PBRAppearance {
-              }
-              geometry IndexedFaceSet {
-              coord Coordinate {
-                  point [
-                      %< for (let i = 0; i < UA.vertices.length; ++i) { >%
-                      %<= UA.vertices[i][0] >% %<= UA.vertices[i][1] >% %<= UA.vertices[i][2] >%
-                      %< } >%
-                  ]
-              }
-              coordIndex [
-                  %<for (let i = 0; i < UA.coordIndices.length; i=i+3) { >%
-                  %<= UA.coordIndices[i][0] >% %<= UA.coordIndices[i][1] >% %<= UA.coordIndices[i][2] >% -1
-                  %<= UA.coordIndices[i+1][0] >% %<= UA.coordIndices[i+1][1] >% %<= UA.coordIndices[i+1][2] >% -1
-                  %<}>%
-              ]
-              }
-            }
-          ]
-          name "upperA_solid"
-          boundingObject USE UA_shape
-          physics Physics {
-            density -1
-            mass 1
+      
+      %< if(useMcphereson) {>% 
+        DEF Strut SliderJoint{
+          jointParameters JointParameters{
+            axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
+            anchor %<=mCPP.x>% %<=mCPP.y>% %<=mCPP.z>% 
           }
+          
+          endPoint DEF strut Solid {
+            children [
+              DEF strut_shape Shape {
+                appearance PBRAppearance {
+                metalness 0
+                baseColor 0.1 0.1 0.1
+                }
+                geometry IndexedFaceSet {
+                coord Coordinate {
+                    point [
+                        %< for (let i = 0; i < strut.vertices.length; ++i) { >%
+                        %<= strut.vertices[i][0] >% %<= strut.vertices[i][1] >% %<= strut.vertices[i][2] >%
+                        %< } >%
+                    ]
+                }
+                coordIndex [
+                    %<for (let i = 0; i < strut.coordIndices.length; i=i+3) { >%
+                    %<= strut.coordIndices[i][0] >% %<= strut.coordIndices[i][1] >% %<= strut.coordIndices[i][2] >% -1
+                    %<= strut.coordIndices[i+1][0] >% %<= strut.coordIndices[i+1][1] >% %<= strut.coordIndices[i+1][2] >% -1
+                    %<}>%
+                ]
+                }
+              }
+            ]
+        name "strut"
+        boundingObject USE strut_shape
+        physics Physics {
         }
       }
+    }#end slider joint
+    %<} 
+      else
+      {>%
+        DEF UA_inner HingeJoint {
+          jointParameters HingeJointParameters {
+            anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
+          }
+          endPoint DEF UA_solid Solid {
+            children [
+              BallJoint {
+                jointParameters BallJointParameters {
+                  staticFriction 1
+                }
+                endPoint SolidReference {
+                }
+              }
+              DEF UA_shape Shape {
+                appearance PBRAppearance {
+                }
+                geometry IndexedFaceSet {
+                coord Coordinate {
+                    point [
+                        %< for (let i = 0; i < UA.vertices.length; ++i) { >%
+                        %<= UA.vertices[i][0] >% %<= UA.vertices[i][1] >% %<= UA.vertices[i][2] >%
+                        %< } >%
+                    ]
+                }
+                coordIndex [
+                    %<for (let i = 0; i < UA.coordIndices.length; i=i+3) { >%
+                    %<= UA.coordIndices[i][0] >% %<= UA.coordIndices[i][1] >% %<= UA.coordIndices[i][2] >% -1
+                    %<= UA.coordIndices[i+1][0] >% %<= UA.coordIndices[i+1][1] >% %<= UA.coordIndices[i+1][2] >% -1
+                    %<}>%
+                ]
+                }
+              }
+            ]
+            name "upperA_solid"
+            boundingObject USE UA_shape
+            physics Physics {
+              density -1
+              mass 1
+            }
+          }
+      }
+      %<}>%
+
+      
       DEF LA_inner HingeJoint {
         jointParameters HingeJointParameters {
           axis %<=axis_lower.x>% %<=axis_lower.y>% %<=axis_lower.z>%
@@ -484,7 +554,7 @@ PROTO SingleSuspension [
                 children [
                   BallJoint {
                     jointParameters BallJointParameters {
-                      anchor %<=urtr.x>% %<=urtr.y>% %<=urtr.z>%
+                      anchor %<=TRAP.x>% %<=TRAP.y>% %<=TRAP.z>%
                       staticFriction 1
                     }
                     endPoint SolidReference {
@@ -498,13 +568,17 @@ PROTO SingleSuspension [
 
                     }
                     endPoint SolidReference {
+                      %< if(useMcphereson){>%
+                        solidName "strut"
+                      %<}else{>%
                       solidName "upperA_solid"
+                      %<}>%
                     }
                   }
                   DEF wheel_hinge HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0 1 0
-                      anchor IS wheel_anchor
+                      anchor IS WheelAnchor 
                     }
                     device [
                       RotationalMotor {
@@ -521,7 +595,7 @@ PROTO SingleSuspension [
                       }
                     ]
                     endPoint DEF %<=wheelName>% Solid {
-                      translation IS wheel_anchor
+                      translation IS WheelAnchor
                       rotation 0.8232371993768892 0.4015825905983689 -0.40126292688260995 1.7633106158223433
                       children [
                         Shape  {
@@ -620,11 +694,3 @@ PROTO SingleSuspension [
     }
   }#end corner solid
 }#end proto
-
-
-
-
-
-
-
-

@@ -34,7 +34,7 @@ PROTO doubleWishbone[
   let steeringMotorName = fields.cornerName.value;//this one is defined specifically
   let wheelName = fields.cornerName.value+"_wheel";
   let contactName = fields.cornerName.value+"_tire_contact";
-  let suspensionMotorName = fields.cornerName.value+"_suspension_motor";
+  let  = fields.cornerName.value+"_suspension_motor";
   let camberAngleSensorName = fields.cornerName.value+"_camberSensor";
   let steerAngleSensorName = fields.cornerName.value+"_steerSensor";
   let brakeName = fields.cornerName.value+"_brake";

@@ -1,0 +1,26 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+IMPORTABLE EXTERNPROTO "../protos/doubleWishbone.proto"
+IMPORTABLE EXTERNPROTO "../protos/SingleSuspension.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/TireRubber.proto"
+
+WorldInfo {
+  basicTimeStep 1
+}
+Viewpoint {
+  orientation 0.07522499823961422 -0.9091684754513362 -0.4095776884613504 5.884505123875947
+  position -1.4276874544995084 -0.08624135854191145 0.6338801925737984
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Robot {
+  children [
+    DEF frontleft_corner_anchor singleSuspension {
+    }
+  ]
+  controller "proto_controller"
+}
