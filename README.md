@@ -6,9 +6,11 @@ steady state and dynamic stabilty of automotive vehicles not widely understood, 
 intends to allow individuals to gain understanding through visualization and simulation in tandem the fundamental physics.
 ## Features: 
 1) Real time simulation of Double Wishbone and Mcpherson Strut suspension behavior. (Trailing Arm, Semi Trailing Arm, and Multilink are planned) 
+
         A) Generation of Camber and Toe curves under dynamic conditions.
         B) Dynamic generation of platform stability graphs (Planned/Stretch)
         C) Roll and Pitch center adjustment scripts (Planned)
+
 2) Dynamic Tyre Model simulation support. Linear, nonlinear, and 3D tabular tires are supported. (May include support for other models in the future)
 3) Procedural Vehicle Generation from JSON Files (Planned)
 4) Single point preview real time vehicle simulation (Planned)
@@ -17,6 +19,6 @@ intends to allow individuals to gain understanding through visualization and sim
 7) Racetrack and road generation from CSV Files (Planned)
 8) Advanced Drivetrain Simulation (Stretch Goal) 
 9) Dynamic Aero Map Support (Stretch Goal)
-10) Tire data reconstruction (Stretch GOal)
+10) Tire data reconstruction (Stretch Goal)
     
     
