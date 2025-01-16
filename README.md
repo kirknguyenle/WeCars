@@ -5,18 +5,18 @@ Almost all modern software packages are either prohibitively expensive, unmainta
 steady state and dynamic stabilty of automotive vehicles not widely understood, but frequently misquoted and misunderstood. This software package 
 intends to allow individuals to gain understanding through visualization and simulation in tandem with the conventional engineering practice. 
 ## Features: 
-    1) Real time simulation of Double Wishbone and Mcpherson Strut suspension behavior. (Trailing Arm, Semi Trailing Arm, and Multilink are planned) 
+1) Real time simulation of Double Wishbone and Mcpherson Strut suspension behavior. (Trailing Arm, Semi Trailing Arm, and Multilink are planned) 
         A) Generation of Camber and Toe curves under dynamic conditions.
         B) Dynamic generation of platform stability graphs (Planned/Stretch)
         C) Roll and Pitch center adjustment scripts (Planned)
-    2) Dynamic Tyre Model simulation support. Linear, nonlinear, and 3D tabular tires are supported. (May include support for other models in the future)
-    3) Procedural Vehicle Generation from JSON Files (Planned)
-    4) Single point preview real time vehicle simulation (Planned)
-    5) Generation of G-G diagrams, Milliken Moment Method diagrams, etc (Planned)
-    6) Racetrack Laptime Simulation (Planned)
-    7) Racetrack and road generation from CSV Files (Planned)
-    8) Advanced Drivetrain Simulation (Stretch Goal) 
-    9) Dynamic Aero Map Support (Stretch Goal)
-    10) Tire data reconstruction (Stretch GOal)
+2) Dynamic Tyre Model simulation support. Linear, nonlinear, and 3D tabular tires are supported. (May include support for other models in the future)
+3) Procedural Vehicle Generation from JSON Files (Planned)
+4) Single point preview real time vehicle simulation (Planned)
+5) Generation of G-G diagrams, Milliken Moment Method diagrams, etc (Planned)
+6) Racetrack Laptime Simulation (Planned)
+7) Racetrack and road generation from CSV Files (Planned)
+8) Advanced Drivetrain Simulation (Stretch Goal) 
+9) Dynamic Aero Map Support (Stretch Goal)
+10) Tire data reconstruction (Stretch GOal)
     
     
