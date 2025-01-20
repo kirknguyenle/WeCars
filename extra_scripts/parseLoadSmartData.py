@@ -2,7 +2,7 @@ import pathlib
 from numpy import *
 from matplotlib.pyplot import *
 
-t,v_x,k,slip,f_y,S,AbsVy = loadtxt(r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\testData\loadSmartTire03-12-2024-23-19-00.txt", delimiter=',', unpack=True)
+t,v_x,k,slip,f_y,S,AbsVy = loadtxt(r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\testData\SuspGraph20-01-2025-10-50-17.txt", delimiter=',', unpack=True)
 #print(slip)
 print(shape(slip))
 print(len(slip))

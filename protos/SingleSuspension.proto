@@ -17,8 +17,9 @@ PROTO singleSuspension [
   field SFFloat tireRadius 0.25 
   field SFFloat tireSectionWidth 0.2 
   field SFFloat SpringRate 5000 
-  field SFFloat SpringPreload 0.001 
   field SFFloat DampingRate 200 
+  field SFFloat AntiRollBarStiffness 800
+  field SFFloat AntiRollBarLeverArm 0.3
   field SFFloat wheelMass 20
   field SFBool useMcphereson TRUE 
   field SFVec3f McpheresonStrutPickupPoint 0 0.1 0.5 
@@ -28,7 +29,8 @@ PROTO singleSuspension [
   #overall javascript calculations for proto-wide definitions
   %< 
   import * as wbgeometry from 'wbgeometry.js';
-  //The vector based geometry generation and parts of the naming convention are borrowed from https://github.com/Alexanderallenbrown/ME377_DoubleWishbone
+  //The vector based geometry generation and parts of the naming convention are borrowed from the work done by Professor Alexander Brown at Lafayette College
+  //In developting resources for ME-377
   // Thank you for your help Doc. 
 
   //creates naming convention strings:
@@ -47,7 +49,7 @@ PROTO singleSuspension [
   let wheelForceSensorDEF;
   let tireShapeDEF;
   let driveMotorName = fields.cornerID.value+"_drive_motor";
-
+  let inertialUnit = "_inertialSensor";
 
 
     switch(fields.cornerID){
@@ -106,12 +108,13 @@ PROTO singleSuspension [
     let axis_strut = {x:(mCPP.x-ubj.x)/mag_strut, y: (mCPP.y-ubj.y)/mag_strut, z:(mCPP.z-ubj.z)/mag_strut }
 
   //compute kp and kd for lower a arm motor based on desired spring/damping to simulate coilover
-  let wheelHinge = fields.WheelAnchor.value;
+  let wheelHinge = fields.WheelAnchor.value;  
   let wheelWidth = fields.tireSectionWidth.value;
   let wheelRadius = fields.tireRadius.value;
   let Kwheel = fields.SpringRate.value;
-  let PreComp = fields.SpringPreload.value;
   let Dwheel = fields.DampingRate.value;
+  let Kr = fields.AntiRollBarStiffness.value;
+  let Larm = fields.AntiRollBarLeverArm.value;
 
   let leverArm_y = wheelHinge.y+wheelWidth/2-anchor_lower.y
   console.log("wheelHinge: ",wheelHinge)
@@ -122,7 +125,7 @@ PROTO singleSuspension [
   //now, Kwheel*z = F, and F*r = T. T/theta = Kp where theta = z/r so
   // Kwheel*(theta*r) = T/r so solve for T/theta
   // Kwheel*r^2 = T/theta = Kp
-  let Kp_LA = Kwheel*Math.pow(leverArm_y,2)
+  let Kp_LA = (Kwheel*Math.pow(leverArm_y,2) + Kr * leverArm_y/Larm)
   let Kd_LA = Dwheel*Math.pow(leverArm_y,2)
 
   //Curtesy of Doc Brown:
@@ -552,6 +555,19 @@ PROTO singleSuspension [
                 #translation 0.01 0.3 0.11
                 rotation 0 1 0 0
                 children [
+                  DEF angleSensor InertialUnit{
+                    name "imu"
+                    children[
+                      IMUShape Shape {
+                        appearance PBRAppearance {
+                        }
+                        geometry Box {
+                          size 0.01 0.01 0.01
+                        }
+                      }
+                    ]
+                    boundingObject USE IMUShape
+                  }
                   BallJoint {
                     jointParameters BallJointParameters {
                       anchor %<=TRAP.x>% %<=TRAP.y>% %<=TRAP.z>%
@@ -561,6 +577,8 @@ PROTO singleSuspension [
                       solidName "tierod"
                     }
                   }
+                  
+
                   BallJoint {
                     jointParameters BallJointParameters {
                       anchor %<=myUBJ.x>% %<=myUBJ.y>% %<=myUBJ.z>%
@@ -592,7 +610,7 @@ PROTO singleSuspension [
                       }
                       PositionSensor {
                         name "%<=wheelEncoderName>%"
-                      }
+                      }                      
                     ]
                     endPoint DEF %<=wheelName>% Solid {
                       translation IS WheelAnchor
