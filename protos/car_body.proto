@@ -1,0 +1,30 @@
+#VRML_SIM R2023b utf8
+
+PROTO car_body [
+    field SFVec3f position 0 0 0
+    field SFRotation rotation   0 0 1 0
+    field SFString name "car_body"
+    field SFVec3f dimensions 2 1 0.333
+    field SFFloat car_mass 1200
+]
+{
+    DEF car_body Solid {
+      children [
+        DEF car_shape Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size IS dimensions
+          }
+        }
+        DEF imu InertialUnit{
+            boundingObject USE car_shape
+        }
+      ]
+      boundingObject USE car_shape
+      physics Physics {
+        density -1
+        mass IS car_mass
+      }
+    }
+}
