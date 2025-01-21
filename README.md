@@ -22,3 +22,8 @@ intends to allow individuals to gain understanding through visualization and sim
 10) Tire data reconstruction (Stretch Goal)
     
     
+
+
+Credits: 
+The Geometry Generation Code in the Single Suspension Proto was done by Professor Alexander Brown at Lafayette College. 
+Joshua A. Marshall, How to Implement a First-Order Low-Pass Filter in Discrete Time, 2021, URL: https://github.com/botprof/first-order-low-pass-filter.
