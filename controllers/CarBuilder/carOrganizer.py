@@ -6,14 +6,15 @@ def createLocationString(lateral, longitudinal):
     if (abs(lateral) != 1 & abs(longitudinal) != 1):
         raise Exception("Use only 1 or negative 1 for locations")
 
-    if (lateral < 0):
-        R = R+"Right"
-    else:
-        R = R+"Left"
+   
     if (longitudinal < 0):
-        R = R+"Rear"
+        R = R+"rear"
     else:
-        R = R+"Front"
+        R = R+"front"
+    if (lateral < 0):
+        R = R+"right"
+    else:
+        R = R+"left"
     return R 
 
 def calculateDiffRatio(wheelbase,steeringAngle,trackwidth):
@@ -32,7 +33,7 @@ def simulateDifferential(inputTorque, ratio):
 
 
 def mirrorY(vec):
-    u = []
+    u = [0,0,0]
     u[0] = vec[0]
     u[1] = -vec[1]
     u[2] = vec[2]

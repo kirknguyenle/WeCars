@@ -21,7 +21,7 @@ PROTO singleSuspension [
   field SFFloat AntiRollBarStiffness 800
   field SFFloat AntiRollBarLeverArm 0.3
   field SFFloat wheelMass 20
-  field SFBool useMcphereson TRUE 
+  field SFBool useMcphereson FALSE 
   field SFVec3f McpheresonStrutPickupPoint 0 0.1 0.5 
 
 ]
@@ -356,6 +356,8 @@ PROTO singleSuspension [
   >%
 
   DEF %<=cornerAnchorName>% Solid{ #this solid is the "mount" for the corner
+    translation IS cornerPose
+    name IS cornerID
     children[
       DEF %<=steerRackName>% SliderJoint{
         jointParameters JointParameters{

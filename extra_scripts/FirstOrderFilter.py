@@ -1,7 +1,8 @@
 import numpy as np
 # Thank you Bryce Gaille for the suggestion of a the First Order Filter
-# Derivation of FOF implementation found from: 
+# Derivation of First-Order Low-Pass Filter in Discrete Time implementation found from: 
 # Joshua A. Marshall, How to Implement a First-Order Low-Pass Filter in Discrete Time, 2021, URL: https://github.com/botprof/first-order-low-pass-filter.
+# Implemenation is my own.
 def firstOrderFilter(x, y, omega, T):
     u = np.zeros(len(y))
     a = ((2-T*omega)/(2+T*omega))

@@ -1,6 +1,6 @@
 import numpy as np
-""""Shamelessly copied from the https://alexanderallenbrown.github.io/ES302_FA24_Students/05_Coordinates_Frames/ 
-    Thank you so much for this Doc"""
+""""Code borrowed from the https://alexanderallenbrown.github.io/ES302_FA24_Students/05_Coordinates_Frames/ 
+    Thank you for allowing me to use your work"""
 def create3DRotationAB(theta,axis):
     """ Create a 3D rotation matrix AB_R (R from A to B ) to express the unit vectors of coordinate system B
         in terms of the unit vectors of coordinate system B for ONE of the principal axes 0,1,2 (x,y,z)

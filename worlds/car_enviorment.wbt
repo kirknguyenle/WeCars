@@ -2,8 +2,11 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+IMPORTABLE EXTERNPROTO "../protos/car_body.proto"
+IMPORTABLE EXTERNPROTO "../protos/SingleSuspension.proto"
 
-WorldInfo {
+DEF WorldInfo WorldInfo {
+  basicTimeStep 1
 }
 Viewpoint {
   orientation -0.5773502691896257 0.5773502691896257 0.5773502691896257 2.0944
@@ -18,5 +21,6 @@ DEF car Robot {
 }
 Robot {
   name "generator"
+  controller "CarBuilder"
   supervisor TRUE
 }

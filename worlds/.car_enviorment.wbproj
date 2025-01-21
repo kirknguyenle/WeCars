@@ -5,5 +5,5 @@ sceneTreePerspectives: 000000ff000000010000000300000026000000c0000000fa010000000
 maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
-textFiles: 1 "protos/car_body.proto" "protos/Archive/WeCarsFormula.proto"
+textFiles: 1 "worlds/car_enviorment.wbt" "controllers/CarBuilder/CarBuilder.py"
 consoles: Console:All:All
