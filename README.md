@@ -25,5 +25,6 @@ intends to allow individuals to gain understanding through visualization and sim
 
 
 Credits: 
-The Geometry Generation Code in the Single Suspension Proto was done by Professor Alexander Brown at Lafayette College. 
+The Geometry Generation in the Single Suspension Proto was done by Professor Alexander Brown. https://github.com/Alexanderallenbrown 
+
 Joshua A. Marshall, How to Implement a First-Order Low-Pass Filter in Discrete Time, 2021, URL: https://github.com/botprof/first-order-low-pass-filter.
