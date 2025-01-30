@@ -1,6 +1,6 @@
 import numpy as np
-""""Shamelessly copied from the https://alexanderallenbrown.github.io/ES302_FA24_Students/05_Coordinates_Frames/ 
-    Thank you so much for this Doc"""
+""""Code borrowed from the https://alexanderallenbrown.github.io/ES302_FA24_Students/05_Coordinates_Frames/ 
+    Thank you for allowing me to use your work"""
 def create3DRotationAB(theta,axis):
     """ Create a 3D rotation matrix AB_R (R from A to B ) to express the unit vectors of coordinate system B
         in terms of the unit vectors of coordinate system B for ONE of the principal axes 0,1,2 (x,y,z)
@@ -23,26 +23,7 @@ def createEulerZYXRotation(roll,pitch,yaw):
     Ry = create3DRotationAB(pitch,1)
     Rx = create3DRotationAB(roll,0)
     return np.dot(Rx,Ry,Rz)
-def create2DRotation(theta):
-    return np.array([[np.cos(theta),np.sin(theta)],[-np.sin(theta),np.cos(theta)]])
+
 
 def arrayToMatrix(array):
     return np.array(array).reshape(3,3)
-
-
-def getEulerAngles(array):
-    """ Returns the Euler angles from a rotation matrix"""
-    sy = np.sqrt(array[0,0] * array[0,0] +  array[1,0] * array[1,0])
- 
-    singular = sy < 1e-6
- 
-    if  not singular :
-        x = np.atan2(array[2,1] , array[2,2])
-        y = np.atan2(-array[2,0], sy)
-        z = np.atan2(array[1,0], array[0,0])
-    else :
-        x = np.atan2(-array[1,2], array[1,1])
-        y = np.atan2(-array[2,0], sy)
-        z = 0
- 
-    return np.array([x, y, z])

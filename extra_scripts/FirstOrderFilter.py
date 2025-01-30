@@ -12,7 +12,7 @@ def firstOrderFilter(x, y, omega, T):
         u[i] = a*u[i-1]+b*dy
     return u
 
-
+# the First Order Low-Pass Filter inherently shifts the data forward, this function simply undoes the shift, but cuts off the final datapoints,
 def postProcess(y, shift):
     u = np.zeros(len(y)-shift)
     for i in range(0, len(y)-shift):

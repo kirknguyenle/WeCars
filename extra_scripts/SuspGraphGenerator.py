@@ -17,12 +17,15 @@ for i in range(280):
     cmb1.append(np.degrees(cmb[i]))
     toe1.append(np.degrees(toe[i]))
 
-o_cmb = 300*(2*np.pi)
+o_cmb = 14400*(2*np.pi)
+alt_cmb = 1200*(2*np.pi)
 o_toe = 300*2*np.pi
-sp_cmb = 0.0000005
+sp_cmb = 0.000005
 sp_toe = 0.0005
 filtered_cmb = fl.firstOrderFilter(bmp1, cmb1, o_cmb, sp_cmb)
+alt_filtered_cmb = fl.firstOrderFilter(bmp1, cmb1, alt_cmb, sp_cmb)
 filtered_toe = fl.firstOrderFilter(bmp1, toe1, o_toe, sp_toe)
+pp_alt = fl.postProcess(alt_filtered_cmb, 2)
 pp_cmb = fl.postProcess(filtered_cmb, 2)
 pp_toe = fl.postProcess(filtered_toe, 8)
 
@@ -32,16 +35,19 @@ pp_toe = fl.postProcess(filtered_toe, 8)
 
 figure, ax1 = subplots()
 #ax1.plot(bmp1[0: len(bmp1)-2], pp_cmb, label = 'sanity check', color = 'orange')
-ax1.plot(bmp1[0: len(bmp1)-2],pp_cmb, label = 'Filter + PP', color = 'blue')
-figure.supxlabel('Bump Travel (cm)')
-figure.supylabel('Camber (Degrees)')
+ax1.plot(cmb1[0:len(cmb1)-2],bmp1[0: len(bmp1)-2], label = 'Filter + PP', color = 'orange')
+ax1.plot(pp_cmb,bmp1[0: len(bmp1)-2], label = 'Filter + PP', color = 'blue')
+ax1.plot(pp_alt,bmp1[0: len(bmp1)-2], label = 'Filter + PP', color = 'green')
+figure.supylabel('Bump Travel (cm)')
+figure.supxlabel('Camber (Degrees)')
+ax1.spines['bottom'].set_position('center')
 figure.legend()
 tight_layout()
 
 figure, ax2 = subplots(1)
 ax2.plot(pp_toe,bmp1[0: len(bmp1)-8], label = 'Filter + PP', color = 'blue')
-figure.supxlabel('Bump Travel (cm)')
-figure.supylabel('Toe (Degrees)')
+figure.supylabel('Bump Travel (cm)')
+figure.supxlabel('Toe (Degrees)')
 ax2.spines['bottom'].set_position('center')
 figure.legend()
 tight_layout()

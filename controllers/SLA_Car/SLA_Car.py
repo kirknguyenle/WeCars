@@ -36,10 +36,12 @@ slipParams = [[mc_nodes[0][0].getField("forceDependentSlip"),
                mc_nodes[0][1].getField("forceDependentSlip")],
               [mc_nodes[1][0].getField("forceDependentSlip"),
                mc_nodes[1][1].getField("forceDependentSlip")]]
-Drives = [[robot.getFromDef(cO.createLocationString(1,1)+"_drive_motor"),
+drives = [[robot.getFromDef(cO.createLocationString(1,1)+"_drive_motor"),
             robot.getFromDef(cO.createLocationString(-1,1)+"_drive_motor")],
             [robot.getFromDef(cO.createLocationString(1,-1)+"_drive_motor"),
              robot.getFromDef(cO.createLocationString(1,-1)+"_drive_motor")]]
+
+
 
 slip = [[0,0],[0,0]]
 

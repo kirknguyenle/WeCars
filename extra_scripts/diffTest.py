@@ -4,7 +4,7 @@ import numpy as np
 import carOrganizer as cO
 
 Torque = 300 #N*M 
-angles = np.arange(0,1.57/4, 0.025)
+angles = np.arange(-1.57/4,1.57/4, 0.025)
 print (angles)
 wheelbase = 6 # meters
 trackwidth = 2 # meters

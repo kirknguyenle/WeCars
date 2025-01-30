@@ -41,6 +41,7 @@ PROTO singleSuspension [
   let wheelName = fields.cornerID.value+"_wheel";
   let contactName = fields.cornerID.value+"_contact";
   let suspensionMotorName = fields.cornerID.value+"_suspension_motor";
+  let suspensionSensorName = fields.cornerID.value+"_suspension_sensor";
   let camberAngleSensorName = fields.cornerID.value+"_camberSensor";
   let steerAngleSensorName = fields.cornerID.value+"_steerSensor";
   let brakeName = fields.cornerID.value+"_brake";
@@ -116,7 +117,7 @@ PROTO singleSuspension [
   let Kr = fields.AntiRollBarStiffness.value;
   let Larm = fields.AntiRollBarLeverArm.value;
 
-  let leverArm_y = wheelHinge.y+wheelWidth/2-anchor_lower.y
+  let leverArm_y = Math.abs(wheelHinge.y)+wheelWidth/2-Math.abs(anchor_lower.y)
   console.log("wheelHinge: ",wheelHinge)
   console.log("wheelWidth: ",wheelWidth)
   console.log("anchor LA: ",anchor_lower)
@@ -527,6 +528,9 @@ PROTO singleSuspension [
             name "%<=suspensionMotorName>%"
             controlPID %<=Kp_LA>% %<=Kd_LA>% 0
             maxTorque 1000000
+          }
+          PositionSensor {
+            name "%<=suspensionSensorName>%"
           }
         ]
         endPoint DEF LA_solid Solid {

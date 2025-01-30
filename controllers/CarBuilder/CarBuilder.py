@@ -24,17 +24,15 @@ with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2.json')
 #Calculate "SingleSuspension" Width 
 
 corner_width = data["wheel_anchor"][1]+data["tire_width"]
-print(corner_width)
 #Calculate "SingleSuspension" X Offset
 x_offset = data["wheel_anchor"][0]
-print(x_offset)
 #Generate Min-Box (Box with mass of simulated car, allowing for 4 wheels to place wheels at edges)
-length = data["wheelbase"]-2*x_offset
+length = data["wheelbase"]-2*x_offset 
+print(length)
 width = data["trackwidth"]-2*corner_width
+print(width)
 height = 2/3
 
-
-        
 #Generate Contact Properties
 
 contact_field.importMFNodeFromString(0,'ContactProperties { material1 "frontleft_contact"}')
@@ -44,119 +42,114 @@ contact_field.importMFNodeFromString(0,'ContactProperties { material1 "rearright
 
 
 #Generate Front Left and place
-
+'''
 children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "frontleft"}')
 
 frontLeft = robot.getFromDef('frontleft_corner_anchor')
 if frontLeft == None:
     sys.exit(1)
-FL_location = frontLeft.getField('cornerPose')
-if FL_location == None:
+fl_location = frontLeft.getField('cornerPose')
+if fl_location == None:
     sys.exit(1)
-FL_newLoc = [length/2, width/2, 0]
-FL_location.setSFVec3f(FL_newLoc)
+fl_newLoc = [length/2, width/2, 0]
+fl_location.setSFVec3f(fl_newLoc)
 
-FL_UPF = frontLeft.getField('UpperFrontPickupPoint')
-FL_UPR = frontLeft.getField('UpperRearPickupPoint')
-FL_LWF = frontLeft.getField('LowerFrontPickupPoint')
-FL_LWR = frontLeft.getField('LowerRearPickupPoint')
-FL_TRP = frontLeft.getField('TieRodPickupPoint')
-FL_TRAP = frontLeft.getField('TieRodAttachmentPoint')
-FL_LBJ = frontLeft.getField('LowerBallJoint')
-FL_UBJ = frontLeft.getField('UpperBallJoint')
-FL_WHA = frontLeft.getField('WheelAnchor')
+fl_UPF = frontLeft.getField('UpperFrontPickupPoint')
+fl_UPR = frontLeft.getField('UpperRearPickupPoint')
+fl_LWF = frontLeft.getField('LowerFrontPickupPoint')
+fl_LWR = frontLeft.getField('LowerRearPickupPoint')
+fl_TRP = frontLeft.getField('TieRodPickupPoint')
+fl_TRAP = frontLeft.getField('TieRodAttachmentPoint')
+fl_LBJ = frontLeft.getField('LowerBallJoint')
+fl_UBJ = frontLeft.getField('UpperBallJoint')
+fl_WHA = frontLeft.getField('WheelAnchor')
 
-FL_UPF.setSFVec3f(data["upper_front_location"])
-FL_UPR.setSFVec3f(data["upper_rear_location"])
-FL_LWF.setSFVec3f(data["lower_front_location"])
-FL_LWR.setSFVec3f(data["lower_rear_location"])
-FL_TRP.setSFVec3f(data["tie_rod_pickup"])
-FL_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
-FL_LBJ.setSFVec3f(data["lower_balljoint"])
-FL_UBJ.setSFVec3f(data["upper_balljoint"])
-FL_WHA.setSFVec3f(data["wheel_anchor"])
-
-
-
-'''while robot.step(timestep) != -1 :
-    simtime += timestep/100
-    if simtime < 2:'''
-
+fl_UPF.setSFVec3f(data["upper_front_location"])
+fl_UPR.setSFVec3f(data["upper_rear_location"])
+fl_LWF.setSFVec3f(data["lower_front_location"])
+fl_LWR.setSFVec3f(data["lower_rear_location"])
+fl_TRP.setSFVec3f(data["tie_rod_pickup"])
+fl_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
+fl_LBJ.setSFVec3f(data["lower_balljoint"])
+fl_UBJ.setSFVec3f(data["upper_balljoint"])
+fl_WHA.setSFVec3f(data["wheel_anchor"])
+'''
 
 
 
 
 #Generate Front Right, Flipping Y cords of suspension, then place
-children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "frontright" }')
+children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "frontright"}')
 
 frontRight = robot.getFromDef('frontright_corner_anchor')
+fr_location = frontRight.getField('cornerPose')
+fr_newLoc = [length/2, -width/2, 0]
+fr_location.setSFVec3f(fr_newLoc)
 
-FR_location = frontRight.getField('cornerPose')
-FR_newLoc = [length/2, -width/2, 0]
-FR_location.setSFVec3f(FR_newLoc)
+fr_UPF = frontRight.getField('UpperFrontPickupPoint')
+fr_UPR = frontRight.getField('UpperRearPickupPoint')
+fr_LWF = frontRight.getField('LowerFrontPickupPoint')
+fr_LWR = frontRight.getField('LowerRearPickupPoint')
+fr_TRP = frontRight.getField('TieRodPickupPoint')
+fr_TRAP = frontRight.getField('TieRodAttachmentPoint')
+fr_LBJ = frontRight.getField('LowerBallJoint')
+fr_UBJ = frontRight.getField('UpperBallJoint')
+fr_WHA = frontRight.getField('WheelAnchor')
+#fr_TRAP.setSFVec3f([-0.1,-0.2,0.05])
+'''
+fr_TRAP.setSFVec3f(cO.mirrorY(data["tie_rod_upright_attachment"]))
+print(cO.mirrorY(data["tie_rod_upright_attachment"]))
+fr_LBJ.setSFVec3f(cO.mirrorY(data["lower_balljoint"]))
+fr_UBJ.setSFVec3f(cO.mirrorY(data["upper_balljoint"]))
+fr_WHA.setSFVec3f(cO.mirrorY(data["wheel_anchor"]))
+fr_UPF.setSFVec3f(cO.mirrorY(data["upper_front_location"]))
+fr_UPR.setSFVec3f(cO.mirrorY(data["upper_rear_location"]))
+fr_LWF.setSFVec3f(cO.mirrorY(data["lower_front_location"]))
+fr_LWR.setSFVec3f(cO.mirrorY(data["lower_rear_location"]))
+fr_TRP.setSFVec3f(cO.mirrorY(data["tie_rod_pickup"]))
 
-FR_UPF = frontRight.getField('UpperFrontPickupPoint')
-FR_UPR = frontRight.getField('UpperRearPickupPoint')
-FR_LWF = frontRight.getField('LowerFrontPickupPoint')
-FR_LWR = frontRight.getField('LowerRearPickupPoint')
-FR_TRP = frontRight.getField('TieRodPickupPoint')
-FR_TRAP = frontRight.getField('TieRodAttachmentPoint')
-FR_LBJ = frontRight.getField('LowerBallJoint')
-FR_UBJ = frontRight.getField('UpperBallJoint')
-FR_WHA = frontRight.getField('WheelAnchor')
+'''
 
-m_UPF = cO.mirrorY(data["upper_front_location"])
-m_UPR = cO.mirrorY(data["upper_rear_location"])
-m_LWF = cO.mirrorY(data["lower_front_location"])
-m_LWR = cO.mirrorY(data["lower_rear_location"])
-m_TRP = cO.mirrorY(data["tie_rod_pickup"])
-m_TRAP = cO.mirrorY(data["tie_rod_upright_attachment"])
-print(m_TRAP)
-m_LBJ = cO.mirrorY(data["lower_balljoint"])
-m_UBJ = cO.mirrorY(data["upper_balljoint"])
-m_WHA = cO.mirrorY(data["wheel_anchor"])
-
-FR_TRP.setSFVec3f(m_TRP)
-FR_UPF.setSFVec3f(m_UPF)
-FR_UPR.setSFVec3f(m_UPR)
-FR_LWF.setSFVec3f(m_LWF)
-FR_LWR.setSFVec3f(m_LWR)
-FR_LBJ.setSFVec3f(m_LBJ)
-FR_UBJ.setSFVec3f(m_UBJ)
-#FR_TRAP.setSFVec3f(m_TRAP)
-FR_LBJ.setSFVec3f(m_LBJ)
-FR_UBJ.setSFVec3f(m_UBJ)
-FR_WHA.setSFVec3f(m_WHA)
+#fr_LBJ.setSFVec3f(m_LBJ)
+#fr_TRP.setSFVec3f(m_TRP)
+#fr_UPF.setSFVec3f(m_UPF)
+#fr_UPR.setSFVec3f(m_UPR)
+#fr_LWF.setSFVec3f(m_LWF)
+#fr_LWR.setSFVec3f(m_LWR)
+#fr_UBJ.setSFVec3f(m_UBJ)
+#fr_TRAP.setSFVec3f(m_TRAP)
+#fr_WHA.setSFVec3f(m_WHA)
 
 
 #Generate Rear Left,
-'''children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "rearleft"}')
+'''
+children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "rearleft"}')
 
 rearLeft = robot.getFromDef('rearleft_corner_anchor')
-RL_location = rearLeft.getField('cornerPose')
-RL_newLoc = [-length/2, width/2, 0]
-RL_location.setSFVec3f(RL_newLoc)
+fl_location = rearLeft.getField('cornerPose')
+fl_newLoc = [-length/2, width/2, 0]
+fl_location.setSFVec3f(fl_newLoc)
 
-RL_UPF = rearLeft.getField('UpperFrontPickupPoint')
-RL_UPR = rearLeft.getField('UpperRearPickupPoint')
-RL_LWF = rearLeft.getField('LowerFrontPickupPoint')
-RL_LWR = rearLeft.getField('LowerRearPickupPoint')
-RL_TRP = rearLeft.getField('TieRodPickupPoint')
-RL_TRAP = rearLeft.getField('TieRodAttachmentPoint')
-RL_LBJ = rearLeft.getField('LowerBallJoint')
-RL_UBJ = rearLeft.getField('UpperBallJoint')
-RL_WHA = rearLeft.getField('WheelAnchor')
+fl_UPF = rearLeft.getField('UpperFrontPickupPoint')
+fl_UPR = rearLeft.getField('UpperRearPickupPoint')
+fl_LWF = rearLeft.getField('LowerFrontPickupPoint')
+fl_LWR = rearLeft.getField('LowerRearPickupPoint')
+fl_TRP = rearLeft.getField('TieRodPickupPoint')
+fl_TRAP = rearLeft.getField('TieRodAttachmentPoint')
+fl_LBJ = rearLeft.getField('LowerBallJoint')
+fl_UBJ = rearLeft.getField('UpperBallJoint')
+fl_WHA = rearLeft.getField('WheelAnchor')
 
-RL_UPF.setSFVec3f(data["upper_front_location"])
-RL_UPR.setSFVec3f(data["upper_rear_location"])
-RL_LWF.setSFVec3f(data["lower_front_location"])
-RL_LWR.setSFVec3f(data["lower_rear_location"])
-RL_TRP.setSFVec3f(data["tie_rod_pickup"])
-RL_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
-RL_LBJ.setSFVec3f(data["lower_balljoint"])
-RL_UBJ.setSFVec3f(data["upper_balljoint"])
-RL_WHA.setSFVec3f(data["wheel_anchor"])
-
+fl_UPF.setSFVec3f(data["upper_front_location"])
+fl_UPR.setSFVec3f(data["upper_rear_location"])
+fl_LWF.setSFVec3f(data["lower_front_location"])
+fl_LWR.setSFVec3f(data["lower_rear_location"])
+fl_TRP.setSFVec3f(data["tie_rod_pickup"])
+fl_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
+fl_LBJ.setSFVec3f(data["lower_balljoint"])
+fl_UBJ.setSFVec3f(data["upper_balljoint"])
+fl_WHA.setSFVec3f(data["wheel_anchor"])'''
+'''
 
 #Generate Rear Right
 children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "rearright"}')

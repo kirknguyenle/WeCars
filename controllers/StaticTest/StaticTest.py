@@ -31,7 +31,7 @@ timestep = int(robot.getBasicTimeStep())
 
 # You should insert a getDevice-like function in order to get the
 # instance of a device of the robot. Something like:
-motor = robot.getDevice('frontleft_suspension_motor')
+motor = robot.getDevice(' ')
 stmotor = robot.getDevice('steer_left')
 tire_sensor = robot.getDevice('imu')
 steer_sensor = robot.getDevice('frontleft_steerSensor')
