@@ -9,6 +9,7 @@ import carOrganizer as cO
 
 #Instantiate Supervisor
 robot = Supervisor()
+timestep = int(robot.getBasicTimeStep())
 car_node = robot.getFromDef('car')
 children_field = car_node.getField('children')
 world_node = robot.getFromDef('WorldInfo')
@@ -31,7 +32,7 @@ length = data["wheelbase"]-2*x_offset
 print(length)
 width = data["trackwidth"]-2*corner_width
 print(width)
-height = 2/3
+height = 0.2
 
 #Generate Contact Properties
 
@@ -40,168 +41,144 @@ contact_field.importMFNodeFromString(0,'ContactProperties { material1 "frontrigh
 contact_field.importMFNodeFromString(0,'ContactProperties { material1 "rearleft_contact"}')
 contact_field.importMFNodeFromString(0,'ContactProperties { material1 "rearright_contact" }')
 
-
-#Generate Front Left and place
-'''
-children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "frontleft"}')
-
-frontLeft = robot.getFromDef('frontleft_corner_anchor')
-if frontLeft == None:
-    sys.exit(1)
-fl_location = frontLeft.getField('cornerPose')
-if fl_location == None:
-    sys.exit(1)
-fl_newLoc = [length/2, width/2, 0]
-fl_location.setSFVec3f(fl_newLoc)
-
-fl_UPF = frontLeft.getField('UpperFrontPickupPoint')
-fl_UPR = frontLeft.getField('UpperRearPickupPoint')
-fl_LWF = frontLeft.getField('LowerFrontPickupPoint')
-fl_LWR = frontLeft.getField('LowerRearPickupPoint')
-fl_TRP = frontLeft.getField('TieRodPickupPoint')
-fl_TRAP = frontLeft.getField('TieRodAttachmentPoint')
-fl_LBJ = frontLeft.getField('LowerBallJoint')
-fl_UBJ = frontLeft.getField('UpperBallJoint')
-fl_WHA = frontLeft.getField('WheelAnchor')
-
-fl_UPF.setSFVec3f(data["upper_front_location"])
-fl_UPR.setSFVec3f(data["upper_rear_location"])
-fl_LWF.setSFVec3f(data["lower_front_location"])
-fl_LWR.setSFVec3f(data["lower_rear_location"])
-fl_TRP.setSFVec3f(data["tie_rod_pickup"])
-fl_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
-fl_LBJ.setSFVec3f(data["lower_balljoint"])
-fl_UBJ.setSFVec3f(data["upper_balljoint"])
-fl_WHA.setSFVec3f(data["wheel_anchor"])
-'''
+mUPF = data["upper_front_location"]
+mUPR = data["upper_rear_location"]
+mLWF = data["lower_front_location"]
+mLWR = data["lower_rear_location"]
+print(mLWF)
+print(mLWR)
+mTRP = data["tie_rod_pickup"]
+mLBJ = data["lower_balljoint"]
+mUBJ = data["upper_balljoint"]
+mTRAP = data["tie_rod_upright_attachment"]
+mWA = data["wheel_anchor"]
+mSTR = data["mcpherson_strut_pickup"]
 
 
+fUPF = cO.mirrorY(mUPF)
+fUPR = cO.mirrorY(mUPR)
+fLWF = cO.mirrorY(mLWF)
+fLWR = cO.mirrorY(mLWR)
+fTRP = cO.mirrorY(mTRP)
+fLBJ = cO.mirrorY(mLBJ)
+fUBJ = cO.mirrorY(mUBJ)
+fTRAP = cO.mirrorY(mTRAP)
+fWA = cO.mirrorY(mWA)
+fSTR = cO.mirrorY(mSTR)
+#Generate Front Left Parameters
+fl_string = ('SingleSuspension {cornerID "frontleft"'+ 
+                              ' cornerPose '+ str(length/2)+' '+ str(width/2)+' '+ str(-2/3)+
+                              ' steerMotorName "steer_left"'+
+                              ' UpperFrontPickupPoint '+ str(mUPF[0])+' '+ str(mUPF[1])+' '+ str(mUPF[2])+
+                              ' UpperRearPickupPoint '+ str(mUPR[0])+' '+str(mUPR[1])+' '+str(mUPR[2])+
+                              ' LowerFrontPickupPoint '+ str(mLWF[0])+' '+str(mLWF[1])+' '+str(mLWF[2])+
+                              ' LowerRearPickupPoint '+ str(mLWR[0])+' '+str(mUPR[1])+' '+str(mLWR[2])+
+                              ' TieRodPickupPoint '+ str(mTRP[0])+' '+str(mTRP[1])+' '+str(mTRP[2])+
+                              ' TieRodAttachmentPoint '+ str(mTRAP[0])+' '+str(mTRAP[1])+' '+str(mTRAP[2])+
+                              ' LowerBallJoint '+ str(mLBJ[0])+' '+str(mLBJ[1])+' '+str(mLBJ[2])+
+                              ' UpperBallJoint '+ str(mUBJ[0])+' '+str(mUBJ[1])+' '+str(mUBJ[2])+
+                              ' WheelAnchor '+ str(mWA[0])+' '+str(mWA[1])+' '+str(mWA[2])+
+                              ' useMcphereson '+ str(data["use_mcpherson"]).upper()+
+                              ' McpheresonStrutPickupPoint '+ str(mSTR[0])+' '+str(mSTR[1])+' '+str(mSTR[2])+
+                              ' AntiRollBarStiffness ' + str(data["anti_rollbar_stiffness"])+
+                              ' AntiRollBarLeverArm ' + str(data["anti_rollbar_lever_arm"])+
+                              ' SpringRate ' + str(data["spring_rate"])+
+                              ' DampingRate ' + str(data["damping_rate"])+
+                              ' tireSectionWidth ' + str(data["tire_width"])+
+                              ' tireRadius ' + str(data["tire_radius"])+
+                              '}')
 
+#Generate Front Right Parameters
+fr_string = ('SingleSuspension {cornerID "frontright"'+ 
+                              ' cornerPose '+ str(length/2)+' '+ str(-width/2)+' '+ str(-2/3)+
+                              ' steerMotorName "steer_right"'+
+                              ' UpperFrontPickupPoint '+ str(fUPF[0])+' '+ str(fUPF[1])+' '+ str(fUPF[2])+
+                              ' UpperRearPickupPoint '+ str(fUPR[0])+' '+str(fUPR[1])+' '+str(fUPR[2])+
+                              ' LowerFrontPickupPoint '+ str(fLWF[0])+' '+str(fLWF[1])+' '+str(fLWF[2])+
+                              ' LowerRearPickupPoint '+ str(fLWR[0])+' '+str(fLWR[1])+' '+str(fLWR[2])+
+                              ' TieRodPickupPoint '+ str(fTRP[0])+' '+str(fTRP[1])+' '+str(fTRP[2])+
+                              ' TieRodAttachmentPoint '+ str(fTRAP[0])+' '+str(fTRAP[1])+' '+str(fTRAP[2])+
+                              ' LowerBallJoint '+ str(fLBJ[0])+' '+str(fLBJ[1])+' '+str(fLBJ[2])+
+                              ' UpperBallJoint '+ str(fUBJ[0])+' '+str(fUBJ[1])+' '+str(fUBJ[2])+
+                              ' WheelAnchor '+ str(fWA[0])+' '+str(fWA[1])+' '+str(fWA[2])+
+                              ' useMcphereson '+ str(data["use_mcpherson"]).upper()+
+                              ' McpheresonStrutPickupPoint '+ str(fSTR[0])+' '+str(fSTR[1])+' '+str(fSTR[2])+
+                              ' AntiRollBarStiffness ' + str(data["anti_rollbar_stiffness"])+
+                              ' AntiRollBarLeverArm ' + str(data["anti_rollbar_lever_arm"])+
+                              ' SpringRate ' + str(data["spring_rate"])+
+                              ' DampingRate ' + str(data["damping_rate"])+
+                              ' tireSectionWidth ' + str(data["tire_width"])+
+                              ' tireRadius ' + str(data["tire_radius"])+
+                              '}')
+
+#Generate Rear Left Parameters
+rl_string = ('SingleSuspension {cornerID "rearleft"'+ 
+                              ' cornerPose '+ str(-length/2)+' '+ str(width/2)+' '+ str(-2/3)+
+                              ' UpperFrontPickupPoint '+ str(mUPF[0])+' '+ str(mUPF[1])+' '+ str(mUPF[2])+
+                              ' UpperRearPickupPoint '+ str(mUPR[0])+' '+str(mUPR[1])+' '+str(mUPR[2])+
+                              ' LowerFrontPickupPoint '+ str(mLWF[0])+' '+str(mLWF[1])+' '+str(mLWF[2])+
+                              ' LowerRearPickupPoint '+ str(mLWR[0])+' '+str(mLWR[1])+' '+str(mLWR[2])+
+                              ' TieRodPickupPoint '+ str(mTRP[0])+' '+str(mTRP[1])+' '+str(mTRP[2])+
+                              ' TieRodAttachmentPoint '+ str(mTRAP[0])+' '+str(mTRAP[1])+' '+str(mTRAP[2])+
+                              ' LowerBallJoint '+ str(mLBJ[0])+' '+str(mLBJ[1])+' '+str(mLBJ[2])+
+                              ' UpperBallJoint '+ str(mUBJ[0])+' '+str(mUBJ[1])+' '+str(mUBJ[2])+
+                              ' WheelAnchor '+ str(mWA[0])+' '+str(mWA[1])+' '+str(mWA[2])+
+                              ' useMcphereson '+ str(data["use_mcpherson"]).upper()+
+                              ' McpheresonStrutPickupPoint '+ str(mSTR[0])+' '+str(mSTR[1])+' '+str(mSTR[2])+
+                              ' AntiRollBarStiffness ' + str(data["anti_rollbar_stiffness"])+
+                              ' AntiRollBarLeverArm ' + str(data["anti_rollbar_lever_arm"])+
+                              ' SpringRate ' + str(data["spring_rate"])+
+                              ' DampingRate ' + str(data["damping_rate"])+
+                              ' tireSectionWidth ' + str(data["tire_width"])+
+                              ' tireRadius ' + str(data["tire_radius"])+
+                              '}')
+
+#Generate Rear Right Parameters
+rr_string = ('SingleSuspension {cornerID "rearright"'+ 
+                              ' cornerPose '+ str(-length/2)+' '+ str(-width/2)+' '+ str(-2/3)+
+                              ' UpperFrontPickupPoint '+ str(fUPF[0])+' '+ str(fUPF[1])+' '+ str(fUPF[2])+
+                              ' UpperRearPickupPoint '+ str(fUPR[0])+' '+str(fUPR[1])+' '+str(fUPR[2])+
+                              ' LowerFrontPickupPoint '+ str(fLWF[0])+' '+str(fLWF[1])+' '+str(fLWF[2])+
+                              ' LowerRearPickupPoint '+ str(fLWR[0])+' '+str(fLWR[1])+' '+str(fLWR[2])+
+                              ' TieRodPickupPoint '+ str(fTRP[0])+' '+str(fTRP[1])+' '+str(fTRP[2])+
+                              ' TieRodAttachmentPoint '+ str(fTRAP[0])+' '+str(fTRAP[1])+' '+str(fTRAP[2])+
+                              ' LowerBallJoint '+ str(fLBJ[0])+' '+str(fLBJ[1])+' '+str(fLBJ[2])+
+                              ' UpperBallJoint '+ str(fUBJ[0])+' '+str(fUBJ[1])+' '+str(fUBJ[2])+
+                              ' WheelAnchor '+ str(fWA[0])+' '+str(fWA[1])+' '+str(fWA[2])+
+                              ' useMcphereson '+ str(data["use_mcpherson"]).upper()+
+                              ' McpheresonStrutPickupPoint '+ str(fSTR[0])+' '+str(fSTR[1])+' '+str(fSTR[2])+
+                              ' AntiRollBarStiffness ' + str(data["anti_rollbar_stiffness"])+
+                              ' AntiRollBarLeverArm ' + str(data["anti_rollbar_lever_arm"])+
+                              ' SpringRate ' + str(data["spring_rate"])+
+                              ' DampingRate ' + str(data["damping_rate"])+
+                              ' tireSectionWidth ' + str(data["tire_width"])+
+                              ' tireRadius ' + str(data["tire_radius"])+
+                              '}')
+
+bdy_string = ('car_body { dimensions ' + str(length) + ' ' + str(width) + ' ' + str(height) +
+            ' car_mass '+ str(data["car_mass"])+
+            '}')
+
+#Generate Front Left
+children_field.importMFNodeFromString(0, fl_string)
 
 #Generate Front Right, Flipping Y cords of suspension, then place
-children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "frontright"}')
+children_field.importMFNodeFromString(0, fr_string)
 
-frontRight = robot.getFromDef('frontright_corner_anchor')
-fr_location = frontRight.getField('cornerPose')
-fr_newLoc = [length/2, -width/2, 0]
-fr_location.setSFVec3f(fr_newLoc)
-
-fr_UPF = frontRight.getField('UpperFrontPickupPoint')
-fr_UPR = frontRight.getField('UpperRearPickupPoint')
-fr_LWF = frontRight.getField('LowerFrontPickupPoint')
-fr_LWR = frontRight.getField('LowerRearPickupPoint')
-fr_TRP = frontRight.getField('TieRodPickupPoint')
-fr_TRAP = frontRight.getField('TieRodAttachmentPoint')
-fr_LBJ = frontRight.getField('LowerBallJoint')
-fr_UBJ = frontRight.getField('UpperBallJoint')
-fr_WHA = frontRight.getField('WheelAnchor')
-#fr_TRAP.setSFVec3f([-0.1,-0.2,0.05])
-'''
-fr_TRAP.setSFVec3f(cO.mirrorY(data["tie_rod_upright_attachment"]))
-print(cO.mirrorY(data["tie_rod_upright_attachment"]))
-fr_LBJ.setSFVec3f(cO.mirrorY(data["lower_balljoint"]))
-fr_UBJ.setSFVec3f(cO.mirrorY(data["upper_balljoint"]))
-fr_WHA.setSFVec3f(cO.mirrorY(data["wheel_anchor"]))
-fr_UPF.setSFVec3f(cO.mirrorY(data["upper_front_location"]))
-fr_UPR.setSFVec3f(cO.mirrorY(data["upper_rear_location"]))
-fr_LWF.setSFVec3f(cO.mirrorY(data["lower_front_location"]))
-fr_LWR.setSFVec3f(cO.mirrorY(data["lower_rear_location"]))
-fr_TRP.setSFVec3f(cO.mirrorY(data["tie_rod_pickup"]))
-
-'''
-
-#fr_LBJ.setSFVec3f(m_LBJ)
-#fr_TRP.setSFVec3f(m_TRP)
-#fr_UPF.setSFVec3f(m_UPF)
-#fr_UPR.setSFVec3f(m_UPR)
-#fr_LWF.setSFVec3f(m_LWF)
-#fr_LWR.setSFVec3f(m_LWR)
-#fr_UBJ.setSFVec3f(m_UBJ)
-#fr_TRAP.setSFVec3f(m_TRAP)
-#fr_WHA.setSFVec3f(m_WHA)
-
-
-#Generate Rear Left,
-'''
-children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "rearleft"}')
-
-rearLeft = robot.getFromDef('rearleft_corner_anchor')
-fl_location = rearLeft.getField('cornerPose')
-fl_newLoc = [-length/2, width/2, 0]
-fl_location.setSFVec3f(fl_newLoc)
-
-fl_UPF = rearLeft.getField('UpperFrontPickupPoint')
-fl_UPR = rearLeft.getField('UpperRearPickupPoint')
-fl_LWF = rearLeft.getField('LowerFrontPickupPoint')
-fl_LWR = rearLeft.getField('LowerRearPickupPoint')
-fl_TRP = rearLeft.getField('TieRodPickupPoint')
-fl_TRAP = rearLeft.getField('TieRodAttachmentPoint')
-fl_LBJ = rearLeft.getField('LowerBallJoint')
-fl_UBJ = rearLeft.getField('UpperBallJoint')
-fl_WHA = rearLeft.getField('WheelAnchor')
-
-fl_UPF.setSFVec3f(data["upper_front_location"])
-fl_UPR.setSFVec3f(data["upper_rear_location"])
-fl_LWF.setSFVec3f(data["lower_front_location"])
-fl_LWR.setSFVec3f(data["lower_rear_location"])
-fl_TRP.setSFVec3f(data["tie_rod_pickup"])
-fl_TRAP.setSFVec3f(data["tie_rod_upright_attachment"])
-fl_LBJ.setSFVec3f(data["lower_balljoint"])
-fl_UBJ.setSFVec3f(data["upper_balljoint"])
-fl_WHA.setSFVec3f(data["wheel_anchor"])'''
-'''
+#Generate Rear Left
+children_field.importMFNodeFromString(0, rl_string)
 
 #Generate Rear Right
-children_field.importMFNodeFromString(0, 'SingleSuspension {cornerID "rearright"}')
+children_field.importMFNodeFromString(0, rr_string)
 
-rearRight = robot.getFromDef('rearright_corner_anchor')
-RR_location = rearRight.getField('cornerPose')
-RR_newLoc = [-length/2, -width/2, 0]
-RR_location.setSFVec3f(RR_newLoc)
-RR_UPF = rearRight.getField('UpperFrontPickupPoint')
-RR_UPR = rearRight.getField('UpperRearPickupPoint')
-RR_LWF = rearRight.getField('LowerFrontPickupPoint')
-RR_LWR = rearRight.getField('LowerRearPickupPoint')
-RR_TRP = rearRight.getField('TieRodPickupPoint')
-RR_TRAP = rearRight.getField('TieRodAttachmentPoint')
-RR_LBJ = rearRight.getField('LowerBallJoint')
-RR_UBJ = rearRight.getField('UpperBallJoint')
-RR_WHA = rearRight.getField('WheelAnchor') 
-
-RR_UPF.setSFVec3f(cO.mirrorY(data["upper_front_location"]))
-RR_UPR.setSFVec3f(cO.mirrorY(data["upper_rear_location"]))
-RR_LWF.setSFVec3f(cO.mirrorY(data["lower_front_location"]))
-RR_LWR.setSFVec3f(cO.mirrorY(data["lower_rear_location"]))
-RR_TRP.setSFVec3f(cO.mirrorY(data["tie_rod_pickup"]))
-RR_TRAP.setSFVec3f(cO.mirrorY(data["tie_rod_upright_attachment"]))
-RR_LBJ.setSFVec3f(cO.mirrorY(data["lower_balljoint"]))
-RR_UBJ.setSFVec3f(cO.mirrorY(data["upper_balljoint"]))
-RR_WHA.setSFVec3f(cO.mirrorY(data["wheel_anchor"]))
-
-'''
+#Generate Car Body
+children_field.importMFNodeFromString(0, bdy_string)
 
 
 
+bounding = car_node.getField("boundingObject")
+bounding.setSFString("car_shape")
 
-
-
-
-'''
-
-use_strut = data("use_mcpherson")
-
-children_field.insertMFBool("useMcphereson", use_strut)
-children_field.insertMFFloat("SpringRate", data("spring_rate"))
-children_field.insertMFFloat("DampingRate", data("damping_rate"))
-children_field.insertMFFloat("AntiRollBarStiffness", data("anti_rollbar_stiffness"))
-children_field.insertMFFloat("AntiRollBarLeverArm", data("anti_rollbar_lever_arm"))
-children_field.insertMFFloat("wheelMass", data("wheel_mass"))
-children_field.insertMFFloat("tireRadius", data("tire_radius"))
-children_field.insertMFFloat("tireSectionWidth", data("tire_width"))
-
-children_field.importMFNodeFromString(0, 'car_body { dimensions ',str(length),' ',str(width),' ',str(height),' car_mass ', str(data["car_mass"]),' }')
-
-'''
 #Done! 
 
 

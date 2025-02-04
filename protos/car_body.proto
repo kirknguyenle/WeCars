@@ -19,6 +19,8 @@ PROTO car_body [
         }
         DEF imu InertialUnit{
             boundingObject USE car_shape
+            physics Physics {
+            }
         }
       ]
       boundingObject USE car_shape

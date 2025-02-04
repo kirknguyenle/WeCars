@@ -1,16 +1,46 @@
-#VRML_SIM R2023b utf8
+#VRML_SIM R2025a utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 IMPORTABLE EXTERNPROTO "../protos/car_body.proto"
 IMPORTABLE EXTERNPROTO "../protos/SingleSuspension.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
 
 DEF WorldInfo WorldInfo {
   basicTimeStep 1
+  contactProperties [
+    ContactProperties {
+      material1 "rearright_contact"
+    }
+    ContactProperties {
+      material1 "rearleft_contact"
+    }
+    ContactProperties {
+      material1 "frontright_contact"
+    }
+    ContactProperties {
+      material1 "frontleft_contact"
+    }
+    ContactProperties {
+      material1 "rearright_contact"
+    }
+    ContactProperties {
+      material1 "rearleft_contact"
+    }
+    ContactProperties {
+      material1 "frontright_contact"
+    }
+    ContactProperties {
+      material1 "frontleft_contact"
+    }
+  ]
 }
 Viewpoint {
-  orientation -0.5773502691896257 0.5773502691896257 0.5773502691896257 2.0944
-  position 0 0 10
+  orientation -0.0360125289311196 0.014323806543702512 0.9992486809228641 2.3850652967189045
+  position 6.504350509376545 -6.128803399564762 1.078028878114072
+}
+Floor {
+  translation 0 0 -1
 }
 TexturedBackground {
 }

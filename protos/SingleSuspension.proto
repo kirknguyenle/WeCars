@@ -35,10 +35,17 @@ PROTO singleSuspension [
 
   //creates naming convention strings:
   let cornerAnchorName = fields.cornerID.value+"_corner_anchor";
+  console.log("Def Name: ", cornerAnchorName)
   let cornerShapeName = fields.cornerID.value+"_corner_shape";
   let steerRackName = fields.cornerID.value+"_steering_rack";
+  let steerRackSolidName = fields.cornerID.value+"_steering_rack_solid";
+  let steerRackShape = fields.cornerID.value+"_steering_rack_shape";
+  console.log(steerRackShape)
   let steeringMotorName = fields.cornerID.value;
+  let tieRodSolidName = fields.cornerID.value+"_tie_rod_solid";
+  let tieRodShape = fields.cornerID.value+"_tie_rod_shape";
   let wheelName = fields.cornerID.value+"_wheel";
+  let wheelShape = fields.cornerID.value+"_wheel_shape";
   let contactName = fields.cornerID.value+"_contact";
   let suspensionMotorName = fields.cornerID.value+"_suspension_motor";
   let suspensionSensorName = fields.cornerID.value+"_suspension_sensor";
@@ -50,7 +57,10 @@ PROTO singleSuspension [
   let wheelForceSensorDEF;
   let tireShapeDEF;
   let driveMotorName = fields.cornerID.value+"_drive_motor";
-  let inertialUnit = "_inertialSensor";
+  let inertialUnit = fields.cornerID.value+"_inertial_sensor";
+  let inertialShape = fields.cornerID.value+"_inertial_shape";
+
+
 
 
     switch(fields.cornerID){
@@ -93,20 +103,38 @@ PROTO singleSuspension [
   let ubj = fields.UpperBallJoint.value;
   console.log("URPP: ", URPP)
 
+  // set A-Arm Names
+  let upperArm = fields.cornerID.value+"_upper_arm";
+  let upperArmSolid = fields.cornerID.value+"_upper_arm_solid";
+  let upperArmShape = fields.cornerID.value+"_upper_arm_shape";
+  let lowerArm = fields.cornerID.value+"_lower_arm";
+  let lowerArmSolid = fields.cornerID.value+"_lower_arm_solid";
+  let lowerArmShape = fields.cornerID.value+"_lower_arm_shape";
+
+  // set Upright Names
+  let upright = fields.cornerID.value+"_upright";
+  let uprightShape = fields.cornerID.value+"_upper_arm_shape";
+  let wheelHingeName = fields.cornerID.value+"wheel_hinge";
+
   // set Mcphereson strut values
   let useMcphereson = fields.useMcphereson.value;
   let mCPP = fields.McpheresonStrutPickupPoint.value;
-    // let mag_upper = Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP,2));
-    let mag_upper = Math.sqrt(1)
-    console.log("upper a mag: ",mag_upper)
-    let axis_upper = {x: (UFPP.x-URPP.x)/mag_upper, y: (UFPP.y-URPP.y)/mag_upper, z: (UFPP.z-URPP.z)/mag_upper};
-    console.log("upper a axis: ",axis_upper)
-    let anchor_upper = {x: (UFPP.x+URPP.x)/2, y: (UFPP.y+URPP.y)/2, z: (UFPP.z+URPP.z)/2};
-    let mag_lower = Math.sqrt(Math.pow((LFPP.x-LRPP.x),2)+Math.pow((LFPP.y-LRPP.y),2)+Math.pow((LFPP.z-LRPP.z),2));
-    let axis_lower = {x: (LFPP.x-LRPP.x)/mag_lower, y: (LFPP.y-LRPP.y)/mag_lower, z: (LFPP.z-LRPP.z)/mag_lower};
-    let anchor_lower = {x: (LFPP.x+LRPP.x)/2, y: (LFPP.y+LRPP.y)/2, z: (LFPP.z+LRPP.z)/2};
-    let mag_strut = Math.sqrt(Math.pow(mCPP.x-ubj.x,2)+Math.pow(mCPP.y-ubj.y,2)+Math.pow(mCPP.z-ubj.z,2))
-    let axis_strut = {x:(mCPP.x-ubj.x)/mag_strut, y: (mCPP.y-ubj.y)/mag_strut, z:(mCPP.z-ubj.z)/mag_strut }
+  let strutName = fields.cornerID.value+"_strut_name";
+  let strutSolid = fields.cornerID.value+"_strut_solid";
+  let strutShape = fields.cornerID.value+"_strut_shape";
+
+
+  // let mag_upper = Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP,2));
+  let mag_upper =  Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP.z),2));
+  console.log("upper a mag: ",mag_upper)
+  let axis_upper = {x: (UFPP.x-URPP.x)/mag_upper, y: (UFPP.y-URPP.y)/mag_upper, z: (UFPP.z-URPP.z)/mag_upper};
+  console.log("upper a axis: ",axis_upper)
+  let anchor_upper = {x: (UFPP.x+URPP.x)/2, y: (UFPP.y+URPP.y)/2, z: (UFPP.z+URPP.z)/2};
+  let mag_lower = Math.sqrt(Math.pow((LFPP.x-LRPP.x),2)+Math.pow((LFPP.y-LRPP.y),2)+Math.pow((LFPP.z-LRPP.z),2));
+  let axis_lower = {x: (LFPP.x-LRPP.x)/mag_lower, y: (LFPP.y-LRPP.y)/mag_lower, z: (LFPP.z-LRPP.z)/mag_lower};
+  let anchor_lower = {x: (LFPP.x+LRPP.x)/2, y: (LFPP.y+LRPP.y)/2, z: (LFPP.z+LRPP.z)/2};
+  let mag_strut = Math.sqrt(Math.pow(mCPP.x-ubj.x,2)+Math.pow(mCPP.y-ubj.y,2)+Math.pow(mCPP.z-ubj.z,2))
+  let axis_strut = {x:(mCPP.x-ubj.x)/mag_strut, y: (mCPP.y-ubj.y)/mag_strut, z:(mCPP.z-ubj.z)/mag_strut }
 
   //compute kp and kd for lower a arm motor based on desired spring/damping to simulate coilover
   let wheelHinge = fields.WheelAnchor.value;  
@@ -337,10 +365,12 @@ PROTO singleSuspension [
   var tieOut = fields.TieRodAttachmentPoint.value;
   var tieRod = new rod(tieIn.x,tieIn.y,tieIn.z,tieOut.x,tieOut.y,tieOut.z,0.005,10);
   tieRod.createTriangles();
- 
-  var strut = new rod(mCPP.x, mCPP.y, mCPP.z, myUBJ.x, myUBJ.y, myUBJ.z, 0.005, 10);
+
+
+  var strut = new rod(mCPP.x, mCPP.y, mCPP.z, myUBJ.x, myUBJ.y, myUBJ.z, 0.005, 10);  
   strut.createTriangles();
-  
+
+
   // //create a space frame for the upper a-arm
   // let ua_pts = [[0,0,0],[0,1,0],[0,0,1]]
   let ua_pts = [[URPP.x,URPP.y,URPP.z],[myUBJ.x,myUBJ.y,myUBJ.z],[UFPP.x,UFPP.y,UFPP.z]]
@@ -371,18 +401,18 @@ PROTO singleSuspension [
             maxForce    1000000
           }
         ]
-        endPoint DEF steering_rack_solid Solid {
+        endPoint DEF %<=steerRackSolidName>% Solid {
           children [
             BallJoint {
               jointParameters BallJointParameters {
                 anchor IS TieRodPickupPoint
                 staticFriction 1
               }
-              endPoint DEF tierod Solid {
+              endPoint DEF %<=tieRodSolidName>% Solid {
                 translation 0 0 0
                 rotation 1 0 0 0
                 children [
-                  DEF tierod_shape Shape {
+                  DEF %<=tieRodShape>% Shape {
                     appearance PBRAppearance {
                     metalness 0
                     baseColor 0.1 0.1 0.1
@@ -405,13 +435,13 @@ PROTO singleSuspension [
                   }
                 ]
                 name "tierod"
-                boundingObject USE tierod_shape
+                boundingObject USE %<=tieRodShape>%
                 physics Physics {
                   mass 0.2
                 }
               }
             }
-            DEF steering_rack_shape Shape {
+            DEF %<=steerRackShape>% Shape {
               appearance PBRAppearance {
               }
               geometry Box {
@@ -420,7 +450,7 @@ PROTO singleSuspension [
             }
           ]
           name "steering_rack"
-          boundingObject USE steering_rack_shape
+          boundingObject USE %<=steerRackShape>%
           physics Physics {
           }
         }
@@ -434,15 +464,15 @@ PROTO singleSuspension [
       }
       
       %< if(useMcphereson) {>% 
-        DEF Strut SliderJoint{
+        DEF %<=strutName>% SliderJoint{
           jointParameters JointParameters{
             axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
             anchor %<=mCPP.x>% %<=mCPP.y>% %<=mCPP.z>% 
           }
           
-          endPoint DEF strut Solid {
+          endPoint DEF %<=strutSolid>% Solid {
             children [
-              DEF strut_shape Shape {
+              DEF %<=strutShape>% Shape {
                 appearance PBRAppearance {
                 metalness 0
                 baseColor 0.1 0.1 0.1
@@ -465,7 +495,7 @@ PROTO singleSuspension [
               }
             ]
         name "strut"
-        boundingObject USE strut_shape
+        boundingObject USE %<=strutShape>%
         physics Physics {
         }
       }
@@ -473,11 +503,11 @@ PROTO singleSuspension [
     %<} 
       else
       {>%
-        DEF UA_inner HingeJoint {
+        DEF %<=upperArm>% HingeJoint {
           jointParameters HingeJointParameters {
             anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
           }
-          endPoint DEF UA_solid Solid {
+          endPoint DEF %<=upperArmSolid>% Solid {
             children [
               BallJoint {
                 jointParameters BallJointParameters {
@@ -486,7 +516,7 @@ PROTO singleSuspension [
                 endPoint SolidReference {
                 }
               }
-              DEF UA_shape Shape {
+              DEF %<=upperArmShape>% Shape {
                 appearance PBRAppearance {
                 }
                 geometry IndexedFaceSet {
@@ -507,7 +537,7 @@ PROTO singleSuspension [
               }
             ]
             name "upperA_solid"
-            boundingObject USE UA_shape
+            boundingObject USE %<=upperArmShape>%
             physics Physics {
               density -1
               mass 1
@@ -517,7 +547,7 @@ PROTO singleSuspension [
       %<}>%
 
       
-      DEF LA_inner HingeJoint {
+      DEF %<=lowerArm>% HingeJoint {
         jointParameters HingeJointParameters {
           axis %<=axis_lower.x>% %<=axis_lower.y>% %<=axis_lower.z>%
           anchor %<=anchor_lower.x>% %<=anchor_lower.y>% %<=anchor_lower.z>%
@@ -533,7 +563,7 @@ PROTO singleSuspension [
             name "%<=suspensionSensorName>%"
           }
         ]
-        endPoint DEF LA_solid Solid {
+        endPoint DEF %<=lowerArmSolid>% Solid {
           #translation 1 1 0.1
           rotation 0.9950371902099893 -0.09950371902099893 0 0
           children [
@@ -557,14 +587,14 @@ PROTO singleSuspension [
                   name "%<=camberAngleSensorName>%"
                 }
               ]
-              endPoint DEF upright Solid {
+              endPoint DEF %<=upright>% Solid {
                 #translation 0.01 0.3 0.11
                 rotation 0 1 0 0
                 children [
                   DEF angleSensor InertialUnit{
                     name "imu"
                     children[
-                      IMUShape Shape {
+                      %<=inertialShape>% Shape {
                         appearance PBRAppearance {
                         }
                         geometry Box {
@@ -572,7 +602,7 @@ PROTO singleSuspension [
                         }
                       }
                     ]
-                    boundingObject USE IMUShape
+                    boundingObject USE %<=inertialShape>%
                   }
                   BallJoint {
                     jointParameters BallJointParameters {
@@ -599,7 +629,7 @@ PROTO singleSuspension [
                       %<}>%
                     }
                   }
-                  DEF wheel_hinge HingeJoint {
+                  DEF %<=wheelHingeName>% HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0 1 0
                       anchor IS WheelAnchor 
@@ -628,7 +658,7 @@ PROTO singleSuspension [
                               rotation 1
                             }
                           }
-                          geometry DEF wheel_shape Cylinder {
+                          geometry DEF %<=wheelShape>% Cylinder {
                             height %<=0.98*wheelWidth>%
                             radius %<=0.98*wheelRadius>%
                           }
@@ -651,14 +681,14 @@ PROTO singleSuspension [
                         }
                       ]
                       contactMaterial "%<=contactName>%"
-                      boundingObject USE wheel_shape
+                      boundingObject USE  %<=wheelShape>%
                       physics Physics {
                         mass IS wheelMass
                       }
                       name "%<=wheelName>%"
                     }
                   }
-                  DEF upright_shape Shape {
+                  DEF %<=uprightShape>% Shape {
                     appearance PBRAppearance {
                     }
                     geometry IndexedFaceSet {
@@ -679,12 +709,12 @@ PROTO singleSuspension [
                   }
                 ]
                 name "upright"
-                boundingObject USE upright_shape
+                boundingObject USE %<=uprightShape>%
                 physics Physics {
                 }
               }
             }
-            DEF LA_shape Shape {
+            DEF %<=lowerArmShape>% Shape {
               appearance PBRAppearance {
               }
               geometry IndexedFaceSet {
@@ -704,7 +734,7 @@ PROTO singleSuspension [
               }
             }
           ]
-          boundingObject USE LA_shape
+          boundingObject USE %<=lowerArmShape>%
           physics Physics {
             density -1
             mass 1

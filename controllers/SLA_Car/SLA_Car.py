@@ -19,8 +19,12 @@ file = open(location, "w")
 
 robot = Supervisor()
 timestep = int(robot.getBasicTimeStep())
-trackwidth = 2
-wheelbase = 6
+
+with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2.json') as f:
+    data = json.load(f)
+
+trackwidth = data["trackwidth"]
+wheelbase = data["trackwidth"]
 
 mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"_contact"),
             robot.getFromDef(cO.createLocationString(-1,1)+"_contact")],
@@ -45,8 +49,11 @@ drives = [[robot.getFromDef(cO.createLocationString(1,1)+"_drive_motor"),
 
 slip = [[0,0],[0,0]]
 
+simtime = 0
 
 
+while robot.step(timestep) != -1:
+    simtime += timestep/100 
 
 
 
