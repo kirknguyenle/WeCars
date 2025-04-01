@@ -19,8 +19,8 @@ save_path = (r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\testData")
 filename = (r"SuspGraph" + runString)
 location = os.path.join(save_path, filename+".txt")
 print(location)
-file = open(location, "w")
-file.write("#Bump,Camber,Caster,Toe,SteerAngle,SteerRack \r\n")
+#file = open(location, "w")
+#file.write("#Bump,Camber,Caster,Toe,SteerAngle,SteerRack \r\n")
 
 breakline = "9,9,9,9,9,"+("9"*29)
 # create the Robot instance.b
@@ -33,6 +33,7 @@ timestep = int(robot.getBasicTimeStep())
 
 # You should insert a getDevice-like function in order to get the
 # instance of a device of the robot. Something like:
+drive = robot.getDevice('frontleft_drive_motor')
 motor = robot.getDevice('frontleft_suspension_motor')
 stmotor = robot.getDevice('steer_left')
 tire_sensor = robot.getDevice('imu')
@@ -51,8 +52,8 @@ data = [0,0,0]
 fig = mpl.figure()
 ax = fig.add_subplot(1, 1, 1)
 
-mpl.ion()
-mpl.show()
+#mpl.ion()
+#mpl.show()
 
 t = 0
 bmpt = []
@@ -81,18 +82,20 @@ while robot.step(timestep) != -1:
   
 
     if simtime <5:
-        motor.setPosition(-0.35)
+        drive.setVelocity(1)
+        #motor.setPosition(-0.35)
         
     if 5<simtime < 383:
+        drive.setVelocity(1)
         counter = math.ceil(simtime*100)-500
-        motor.setPosition(jounceRange[counter-1])
-        file.write(
-                    str(jounceRange[counter-1])+","+
-                    str(data[0])+","+
-                    str(data[1])+","+
-                    str(data[2])+","+
-                    str(steer_sensor.getValue())+","+
-                    "0.0"+"\r\n")
+        #motor.setPosition(jounceRange[counter-2])
+        #file.write(
+        #            str(jounceRange[counter-1])+","+
+        #            str(data[0])+","+
+        #            str(data[1])+","+
+        #            str(data[2])+","+
+        #            str(steer_sensor.getValue())+","+
+        #            "0.0"+"\r\n")
         
 
     

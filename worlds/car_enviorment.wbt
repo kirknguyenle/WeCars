@@ -5,49 +5,120 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 IMPORTABLE EXTERNPROTO "../protos/car_body.proto"
 IMPORTABLE EXTERNPROTO "../protos/SingleSuspension.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/TireRubber.proto"
 
 DEF WorldInfo WorldInfo {
+  CFM 1e-10
+  ERP 0.6
   basicTimeStep 1
+  defaultDamping Damping {
+  }
+  lineScale 1
   contactProperties [
-    ContactProperties {
+    DEF rearright_contact ContactProperties {
       material1 "rearright_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF rearleft_contact ContactProperties {
       material1 "rearleft_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF frontright_contact ContactProperties {
       material1 "frontright_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF frontleft_contact ContactProperties {
       material1 "frontleft_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF rearright_contact ContactProperties {
       material1 "rearright_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF rearleft_contact ContactProperties {
       material1 "rearleft_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF frontright_contact ContactProperties {
       material1 "frontright_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
     }
-    ContactProperties {
+    DEF frontleft_contact ContactProperties {
       material1 "frontleft_contact"
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      softERP 0.1
+      softCFM 1e-05
+      maxContactJoints 5
+    }
+    DEF generic ContactProperties {
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      bounceVelocity 40
+      softERP 0.01
+      softCFM 1e-07
+      maxContactJoints 8
     }
   ]
 }
 Viewpoint {
-  orientation -0.0360125289311196 0.014323806543702512 0.9992486809228641 2.3850652967189045
-  position 6.504350509376545 -6.128803399564762 1.078028878114072
+  orientation -0.0640825705451434 0.9979285604454583 -0.0056579501219155785 0.5166439246745855
+  position -2.253690272996445 -0.01547711527782067 2.1710539989036852
 }
 Floor {
-  translation 0 0 -1
+  translation 0 0 -0.4
+  size 100 100
+  tileSize 20 20
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
-}
-DEF car Robot {
-  name "car"
 }
 Robot {
   name "generator"

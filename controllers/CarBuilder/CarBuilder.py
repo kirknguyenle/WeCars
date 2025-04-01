@@ -10,8 +10,10 @@ import carOrganizer as cO
 #Instantiate Supervisor
 robot = Supervisor()
 timestep = int(robot.getBasicTimeStep())
-car_node = robot.getFromDef('car')
-children_field = car_node.getField('children')
+root_node = robot.getRoot()
+#car_node = robot.getFromDef('car')
+root_field = root_node.getField('children')
+#children_field = car_node.getField('children')
 world_node = robot.getFromDef('WorldInfo')
 contact_field =  world_node.getField('contactProperties')
 timestep = int(robot.getBasicTimeStep())
@@ -36,17 +38,18 @@ height = 0.2
 
 #Generate Contact Properties
 
-contact_field.importMFNodeFromString(0,'ContactProperties { material1 "frontleft_contact"}')
-contact_field.importMFNodeFromString(0,'ContactProperties { material1 "frontright_contact"}')
-contact_field.importMFNodeFromString(0,'ContactProperties { material1 "rearleft_contact"}')
-contact_field.importMFNodeFromString(0,'ContactProperties { material1 "rearright_contact" }')
+contact_field.importMFNodeFromString(0,'DEF frontleft_contact ContactProperties { material1 "frontleft_contact" softCFM 0.00001 softERP 0.1 coulombFriction 8 bounce 0 maxContactJoints 5 forceDependentSlip 0.9}')
+contact_field.importMFNodeFromString(0,'DEF frontright_contact ContactProperties { material1 "frontright_contact" softCFM 0.00001 softERP 0.1 coulombFriction 8 bounce 0 maxContactJoints 5 forceDependentSlip 0.9}')
+contact_field.importMFNodeFromString(0,'DEF rearleft_contact ContactProperties { material1 "rearleft_contact" softCFM 0.00001 softERP 0.1 coulombFriction 8 bounce 0 maxContactJoints 5 forceDependentSlip 0.9}')
+contact_field.importMFNodeFromString(0,'DEF rearright_contact ContactProperties { material1 "rearright_contact" softCFM 0.00001 softERP 0.1 coulombFriction 8 bounce 0 maxContactJoints 5 forceDependentSlip 0.9}')
 
+
+
+ 
 mUPF = data["upper_front_location"]
 mUPR = data["upper_rear_location"]
 mLWF = data["lower_front_location"]
 mLWR = data["lower_rear_location"]
-print(mLWF)
-print(mLWR)
 mTRP = data["tie_rod_pickup"]
 mLBJ = data["lower_balljoint"]
 mUBJ = data["upper_balljoint"]
@@ -67,7 +70,7 @@ fWA = cO.mirrorY(mWA)
 fSTR = cO.mirrorY(mSTR)
 #Generate Front Left Parameters
 fl_string = ('SingleSuspension {cornerID "frontleft"'+ 
-                              ' cornerPose '+ str(length/2)+' '+ str(width/2)+' '+ str(-2/3)+
+                              ' cornerPose '+ str(length/2)+' '+ str(width/2)+' '+ str(-height/2)+
                               ' steerMotorName "steer_left"'+
                               ' UpperFrontPickupPoint '+ str(mUPF[0])+' '+ str(mUPF[1])+' '+ str(mUPF[2])+
                               ' UpperRearPickupPoint '+ str(mUPR[0])+' '+str(mUPR[1])+' '+str(mUPR[2])+
@@ -86,11 +89,12 @@ fl_string = ('SingleSuspension {cornerID "frontleft"'+
                               ' DampingRate ' + str(data["damping_rate"])+
                               ' tireSectionWidth ' + str(data["tire_width"])+
                               ' tireRadius ' + str(data["tire_radius"])+
+                              ' wheelMass ' + str(data["wheel_mass"])+
                               '}')
 
 #Generate Front Right Parameters
 fr_string = ('SingleSuspension {cornerID "frontright"'+ 
-                              ' cornerPose '+ str(length/2)+' '+ str(-width/2)+' '+ str(-2/3)+
+                              ' cornerPose '+ str(length/2)+' '+ str(-width/2)+' '+ str(-height/2)+
                               ' steerMotorName "steer_right"'+
                               ' UpperFrontPickupPoint '+ str(fUPF[0])+' '+ str(fUPF[1])+' '+ str(fUPF[2])+
                               ' UpperRearPickupPoint '+ str(fUPR[0])+' '+str(fUPR[1])+' '+str(fUPR[2])+
@@ -109,11 +113,13 @@ fr_string = ('SingleSuspension {cornerID "frontright"'+
                               ' DampingRate ' + str(data["damping_rate"])+
                               ' tireSectionWidth ' + str(data["tire_width"])+
                               ' tireRadius ' + str(data["tire_radius"])+
+                              ' wheelMass ' + str(data["wheel_mass"])+
                               '}')
 
 #Generate Rear Left Parameters
 rl_string = ('SingleSuspension {cornerID "rearleft"'+ 
-                              ' cornerPose '+ str(-length/2)+' '+ str(width/2)+' '+ str(-2/3)+
+                              ' cornerPose '+ str(-length/2)+' '+ str(width/2)+' '+ str(-height/2)+
+                              ' steerMotorName "rear_static_left"'+
                               ' UpperFrontPickupPoint '+ str(mUPF[0])+' '+ str(mUPF[1])+' '+ str(mUPF[2])+
                               ' UpperRearPickupPoint '+ str(mUPR[0])+' '+str(mUPR[1])+' '+str(mUPR[2])+
                               ' LowerFrontPickupPoint '+ str(mLWF[0])+' '+str(mLWF[1])+' '+str(mLWF[2])+
@@ -131,11 +137,13 @@ rl_string = ('SingleSuspension {cornerID "rearleft"'+
                               ' DampingRate ' + str(data["damping_rate"])+
                               ' tireSectionWidth ' + str(data["tire_width"])+
                               ' tireRadius ' + str(data["tire_radius"])+
+                              ' wheelMass ' + str(data["wheel_mass"])+
                               '}')
 
 #Generate Rear Right Parameters
 rr_string = ('SingleSuspension {cornerID "rearright"'+ 
-                              ' cornerPose '+ str(-length/2)+' '+ str(-width/2)+' '+ str(-2/3)+
+                              ' cornerPose '+ str(-length/2)+' '+ str(-width/2)+' '+ str(-height/2)+
+                              ' steerMotorName "rear_static_right"'+
                               ' UpperFrontPickupPoint '+ str(fUPF[0])+' '+ str(fUPF[1])+' '+ str(fUPF[2])+
                               ' UpperRearPickupPoint '+ str(fUPR[0])+' '+str(fUPR[1])+' '+str(fUPR[2])+
                               ' LowerFrontPickupPoint '+ str(fLWF[0])+' '+str(fLWF[1])+' '+str(fLWF[2])+
@@ -153,11 +161,20 @@ rr_string = ('SingleSuspension {cornerID "rearright"'+
                               ' DampingRate ' + str(data["damping_rate"])+
                               ' tireSectionWidth ' + str(data["tire_width"])+
                               ' tireRadius ' + str(data["tire_radius"])+
+                              ' wheelMass ' + str(data["wheel_mass"])+
                               '}')
 
 bdy_string = ('car_body { dimensions ' + str(length) + ' ' + str(width) + ' ' + str(height) +
             ' car_mass '+ str(data["car_mass"])+
             '}')
+
+#Generate Car Body
+root_field.importMFNodeFromString(0, bdy_string)
+
+car_node = robot.getFromDef('car')
+children_field = car_node.getField('extension')
+
+
 
 #Generate Front Left
 children_field.importMFNodeFromString(0, fl_string)
@@ -171,13 +188,12 @@ children_field.importMFNodeFromString(0, rl_string)
 #Generate Rear Right
 children_field.importMFNodeFromString(0, rr_string)
 
-#Generate Car Body
-children_field.importMFNodeFromString(0, bdy_string)
 
 
 
-bounding = car_node.getField("boundingObject")
-bounding.setSFString("car_shape")
+
+#bounding = car_node.getField("boundingObject")
+#bounding.setSFString("car_shape")
 
 #Done! 
 

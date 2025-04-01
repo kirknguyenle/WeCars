@@ -2,7 +2,7 @@
 # template language: javascript
 PROTO singleSuspension [
   field SFString cornerID "frontleft"
-  hiddenField SFString  steerMotorName "steer_left"
+  field SFString  steerMotorName "steer_left"
   field SFRotation cornerRotation 1 0 0 0 
   field SFVec3f cornerPose 0 0 0 
   field SFVec3f LowerRearPickupPoint -0.2 0 0 
@@ -42,6 +42,7 @@ PROTO singleSuspension [
   let steerRackShape = fields.cornerID.value+"_steering_rack_shape";
   console.log(steerRackShape)
   let steeringMotorName = fields.cornerID.value;
+  let tieRodName = fields.cornerID.value+"_tie_rod_name";
   let tieRodSolidName = fields.cornerID.value+"_tie_rod_solid";
   let tieRodShape = fields.cornerID.value+"_tie_rod_shape";
   let wheelName = fields.cornerID.value+"_wheel";
@@ -53,17 +54,16 @@ PROTO singleSuspension [
   let steerAngleSensorName = fields.cornerID.value+"_steerSensor";
   let brakeName = fields.cornerID.value+"_brake";
   let wheelEncoderName = fields.cornerID.value+"_encoder";
-  let wheelForceSensorName;
-  let wheelForceSensorDEF;
-  let tireShapeDEF;
   let driveMotorName = fields.cornerID.value+"_drive_motor";
   let inertialUnit = fields.cornerID.value+"_inertial_sensor";
   let inertialShape = fields.cornerID.value+"_inertial_shape";
+  let wheelForceSensorName;
+  let wheelForceSensorDEF;
+  let tireShapeDEF;
 
 
 
-
-    switch(fields.cornerID){
+    switch(fields.cornerID.value){
     case "frontleft":
       tireShapeDEF = "ts_shape_frontLeft";
       steeringMotorName = "steer_left";
@@ -92,6 +92,7 @@ PROTO singleSuspension [
       wheelForceSensorName = "ts";
       break
   }
+
   
     // set SLA suspension values
   let TRAP = fields.TieRodAttachmentPoint.value;
@@ -107,13 +108,15 @@ PROTO singleSuspension [
   let upperArm = fields.cornerID.value+"_upper_arm";
   let upperArmSolid = fields.cornerID.value+"_upper_arm_solid";
   let upperArmShape = fields.cornerID.value+"_upper_arm_shape";
+  let upperArmName = fields.cornerID.value+"upper_arm_name";
   let lowerArm = fields.cornerID.value+"_lower_arm";
   let lowerArmSolid = fields.cornerID.value+"_lower_arm_solid";
   let lowerArmShape = fields.cornerID.value+"_lower_arm_shape";
 
   // set Upright Names
   let upright = fields.cornerID.value+"_upright";
-  let uprightShape = fields.cornerID.value+"_upper_arm_shape";
+  let uprightShape = fields.cornerID.value+"_upright_shape";
+  let uprightName = fields.cornerID.value+"_upright_name";
   let wheelHingeName = fields.cornerID.value+"wheel_hinge";
 
   // set Mcphereson strut values
@@ -126,6 +129,7 @@ PROTO singleSuspension [
 
   // let mag_upper = Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP,2));
   let mag_upper =  Math.sqrt(Math.pow((UFPP.x-URPP.x),2)+Math.pow((UFPP.y-URPP.y),2)+Math.pow((UFPP.z-URPP.z),2));
+  //let mag_upper = Math.sqrt(1)
   console.log("upper a mag: ",mag_upper)
   let axis_upper = {x: (UFPP.x-URPP.x)/mag_upper, y: (UFPP.y-URPP.y)/mag_upper, z: (UFPP.z-URPP.z)/mag_upper};
   console.log("upper a axis: ",axis_upper)
@@ -355,6 +359,7 @@ PROTO singleSuspension [
 
   var myUBJ = fields.UpperBallJoint.value;
   var myLBJ = fields.LowerBallJoint.value;
+  var myIMU = {x: myUBJ.x-myLBJ.x, y: myUBJ.y*0.9, z: myUBJ.z/2}
 
   //create a rod object for upright using the proto fields
   var myUpright = new rod(myUBJ.x, myUBJ.y,myUBJ.z,myLBJ.x,myLBJ.y,myLBJ.z,0.005,10);
@@ -366,18 +371,18 @@ PROTO singleSuspension [
   var tieRod = new rod(tieIn.x,tieIn.y,tieIn.z,tieOut.x,tieOut.y,tieOut.z,0.005,10);
   tieRod.createTriangles();
 
-
+  
   var strut = new rod(mCPP.x, mCPP.y, mCPP.z, myUBJ.x, myUBJ.y, myUBJ.z, 0.005, 10);  
   strut.createTriangles();
 
 
   // //create a space frame for the upper a-arm
   // let ua_pts = [[0,0,0],[0,1,0],[0,0,1]]
-  let ua_pts = [[URPP.x,URPP.y,URPP.z],[myUBJ.x,myUBJ.y,myUBJ.z],[UFPP.x,UFPP.y,UFPP.z]]
+  let ua_pts = [[URPP.x,URPP.y,URPP.z],[myUBJ.x,myUBJ.y - 0.1*(Math.sign(myUBJ.y)),myUBJ.z],[UFPP.x,UFPP.y,UFPP.z]]
   var UA = new spaceFrame(ua_pts,0.01,4)
   UA.createTriangles();//THIS IS CAUSING ERROR
 
-  let la_pts = [[LRPP.x,LRPP.y,LRPP.z],[myLBJ.x,myLBJ.y,myLBJ.z],[LFPP.x,LFPP.y,LFPP.z]]
+  let la_pts = [[LRPP.x,LRPP.y,LRPP.z],[myLBJ.x,myLBJ.y- 0.1*(Math.sign(myLBJ.y)),myLBJ.z],[LFPP.x,LFPP.y,LFPP.z]]
   var LA = new spaceFrame(la_pts,0.01,4)
   LA.createTriangles();
   // console.log("la pts: ",la_pts)
@@ -386,365 +391,379 @@ PROTO singleSuspension [
 
   >%
 
-  DEF %<=cornerAnchorName>% Solid{ #this solid is the "mount" for the corner
-    translation IS cornerPose
-    name IS cornerID
-    children[
-      DEF %<=steerRackName>% SliderJoint{
-        jointParameters JointParameters{
-          axis 0 1 0
-        }
-        device [
-          LinearMotor{
-            name IS steerMotorName
-            controlPID  10000 0 0
-            maxForce    1000000
+    DEF %<=cornerAnchorName>% Solid{ #this solid is the "mount" for the corner
+      translation IS cornerPose
+      name   IS cornerID
+      children[
+        DEF %<=steerRackName>% SliderJoint{
+          jointParameters JointParameters{
+            axis 0 1 0
           }
-        ]
-        endPoint DEF %<=steerRackSolidName>% Solid {
-          children [
-            BallJoint {
-              jointParameters BallJointParameters {
-                anchor IS TieRodPickupPoint
-                staticFriction 1
-              }
-              endPoint DEF %<=tieRodSolidName>% Solid {
-                translation 0 0 0
-                rotation 1 0 0 0
-                children [
-                  DEF %<=tieRodShape>% Shape {
-                    appearance PBRAppearance {
-                    metalness 0
-                    baseColor 0.1 0.1 0.1
-                    }
-                    geometry IndexedFaceSet {
-                    coord Coordinate {
-                        point [
-                            %< for (let i = 0; i < tieRod.vertices.length; ++i) { >%
-                            %<= tieRod.vertices[i][0] >% %<= tieRod.vertices[i][1] >% %<= tieRod.vertices[i][2] >%
-                            %< } >%
-                        ]
-                    }
-                    coordIndex [
-                        %<for (let i = 0; i < tieRod.coordIndices.length; i=i+3) { >%
-                        %<= tieRod.coordIndices[i][0] >% %<= tieRod.coordIndices[i][1] >% %<= tieRod.coordIndices[i][2] >% -1
-                        %<= tieRod.coordIndices[i+1][0] >% %<= tieRod.coordIndices[i+1][1] >% %<= tieRod.coordIndices[i+1][2] >% -1
-                        %<}>%
-                    ]
-                    }
-                  }
-                ]
-                name "tierod"
-                boundingObject USE %<=tieRodShape>%
-                physics Physics {
-                  mass 0.2
-                }
-              }
-            }
-            DEF %<=steerRackShape>% Shape {
-              appearance PBRAppearance {
-              }
-              geometry Box {
-                size 0.01 0.01 0.01
-              }
+          device [
+            LinearMotor{
+            name IS steerMotorName
+              controlPID  100 70 0
+              maxForce    1000000
             }
           ]
-          name "steering_rack"
-          boundingObject USE %<=steerRackShape>%
-          physics Physics {
-          }
-        }
-      }#end slider joint
-      DEF %<=cornerShapeName>% Shape{
-        appearance PBRAppearance{
-        }
-        geometry Box{
-          size .01 .01 .01
-        }
-      }
-      
-      %< if(useMcphereson) {>% 
-        DEF %<=strutName>% SliderJoint{
-          jointParameters JointParameters{
-            axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
-            anchor %<=mCPP.x>% %<=mCPP.y>% %<=mCPP.z>% 
-          }
-          
-          endPoint DEF %<=strutSolid>% Solid {
-            children [
-              DEF %<=strutShape>% Shape {
-                appearance PBRAppearance {
-                metalness 0
-                baseColor 0.1 0.1 0.1
-                }
-                geometry IndexedFaceSet {
-                coord Coordinate {
-                    point [
-                        %< for (let i = 0; i < strut.vertices.length; ++i) { >%
-                        %<= strut.vertices[i][0] >% %<= strut.vertices[i][1] >% %<= strut.vertices[i][2] >%
-                        %< } >%
-                    ]
-                }
-                coordIndex [
-                    %<for (let i = 0; i < strut.coordIndices.length; i=i+3) { >%
-                    %<= strut.coordIndices[i][0] >% %<= strut.coordIndices[i][1] >% %<= strut.coordIndices[i][2] >% -1
-                    %<= strut.coordIndices[i+1][0] >% %<= strut.coordIndices[i+1][1] >% %<= strut.coordIndices[i+1][2] >% -1
-                    %<}>%
-                ]
-                }
-              }
-            ]
-        name "strut"
-        boundingObject USE %<=strutShape>%
-        physics Physics {
-        }
-      }
-    }#end slider joint
-    %<} 
-      else
-      {>%
-        DEF %<=upperArm>% HingeJoint {
-          jointParameters HingeJointParameters {
-            anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
-          }
-          endPoint DEF %<=upperArmSolid>% Solid {
+          endPoint DEF %<=steerRackSolidName>% Solid {
             children [
               BallJoint {
                 jointParameters BallJointParameters {
+                  anchor IS TieRodPickupPoint
                   staticFriction 1
                 }
-                endPoint SolidReference {
+                endPoint DEF %<=tieRodSolidName>% Solid {
+                  translation 0 0 0
+                  rotation 1 0 0 0
+                  children [
+                    DEF %<=tieRodShape>% Shape {
+                      appearance PBRAppearance {
+                      metalness 0
+                      baseColor 0.1 0.1 0.1
+                      }
+                      geometry IndexedFaceSet {
+                      coord Coordinate {
+                          point [
+                              %< for (let i = 0; i < tieRod.vertices.length; ++i) { >%
+                              %<= tieRod.vertices[i][0] >% %<= tieRod.vertices[i][1] >% %<= tieRod.vertices[i][2] >%
+                              %< } >%
+                          ]
+                      }
+                      coordIndex [
+                          %<for (let i = 0; i < tieRod.coordIndices.length; i=i+3) { >%
+                          %<= tieRod.coordIndices[i][0] >% %<= tieRod.coordIndices[i][1] >% %<= tieRod.coordIndices[i][2] >% -1
+                          %<= tieRod.coordIndices[i+1][0] >% %<= tieRod.coordIndices[i+1][1] >% %<= tieRod.coordIndices[i+1][2] >% -1
+                          %<}>%
+                      ]
+                      }
+                    }
+                  ]
+                  name "%<=tieRodName>%"
+                  boundingObject USE %<=tieRodShape>%
+      
+                  physics Physics {
+                    mass 0.2
+
+                  }
                 }
               }
-              DEF %<=upperArmShape>% Shape {
+              DEF %<=steerRackShape>% Shape {
+                appearance PBRAppearance {
+                }
+                geometry Box {
+                  size 0.01 0.01 0.01
+                }
+              }
+            ]
+            name "steering_rack"
+            boundingObject USE %<=steerRackShape>%
+            physics Physics {
+            }
+          }
+        }#end slider joint
+        DEF %<=cornerShapeName>% Shape{
+          appearance PBRAppearance{
+          }
+          geometry Box{
+            size .01 .01 .01
+          }
+        }
+        
+        %< if(!useMcphereson) {>% 
+        DEF %<=upperArm>% HingeJoint {
+            jointParameters HingeJointParameters {
+              anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
+              stopERP 0.0001
+              stopCFM 0.0000001
+            }
+            endPoint DEF %<=upperArmSolid>% Solid {
+              children [
+                DEF %<=upperArmShape>% Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry IndexedFaceSet {
+                  coord Coordinate {
+                      point [
+                          %< for (let i = 0; i < UA.vertices.length; ++i) { >%
+                          %<= UA.vertices[i][0] >% %<= UA.vertices[i][1] >% %<= UA.vertices[i][2] >%
+                          %< } >%
+                      ]
+                  }
+                  coordIndex [
+                      %<for (let i = 0; i < UA.coordIndices.length; i=i+3) { >%
+                      %<= UA.coordIndices[i][0] >% %<= UA.coordIndices[i][1] >% %<= UA.coordIndices[i][2] >% -1
+                      %<= UA.coordIndices[i+1][0] >% %<= UA.coordIndices[i+1][1] >% %<= UA.coordIndices[i+1][2] >% -1
+                      %<}>%
+                  ]
+                  }
+                }
+              ]
+              name "%<=upperArmName>%"
+              boundingObject USE %<=upperArmShape>%
+              physics Physics {
+                density -1
+                mass 1
+              }
+            }
+        }
+        
+      %<}>%
+          
+  
+        
+        DEF %<=lowerArm>% HingeJoint {
+          jointParameters HingeJointParameters {
+            axis %<=axis_lower.x>% %<=axis_lower.y>% %<=axis_lower.z>%
+            anchor %<=anchor_lower.x>% %<=anchor_lower.y>% %<=anchor_lower.z>%
+            staticFriction 10
+            stopERP 0.0001
+            stopCFM 0.0000001
+          }
+          device [
+            RotationalMotor {
+              name "%<=suspensionMotorName>%"
+              controlPID %<=Kp_LA>% %<=Kd_LA>% 0
+              maxTorque 1000000
+            }
+            PositionSensor {
+              name "%<=suspensionSensorName>%"
+            }
+          ]
+          endPoint DEF %<=lowerArmSolid>% Solid {
+            rotation 1 -0.1 0 0
+            children [
+              BallJoint {
+                jointParameters BallJointParameters {
+                  anchor %<=myLBJ.x>% %<=myLBJ.y>% %<=myLBJ.z>%
+                  staticFriction 1
+                }
+                jointParameters2 JointParameters {
+                }
+                jointParameters3 JointParameters {
+                  axis 1 0 0
+                }
+                device2 [
+                  PositionSensor {
+                    name "%<=steerAngleSensorName>%"
+                  }
+                ]
+                device3 [
+                  PositionSensor {
+                    name "%<=camberAngleSensorName>%"
+                  }
+                ]
+                endPoint DEF %<=upright>% Solid {
+                  #translation 0.01 0.3 0.11
+                  rotation 0 1 0 0
+                  children [
+                    DEF angleSensor InertialUnit{
+                      translation %<=myIMU.x>% %<=myIMU.y>% %<=myIMU.z>%
+                      name "imu"
+                      children[
+                        DEF %<=inertialShape>% Shape {
+                          appearance PBRAppearance {
+                            baseColor 0.305882 0.898039 0.25098
+                            roughness 1
+                            metalness 0
+                          }
+                          geometry Box {
+                            size 0.01 0.01 0.01
+                          }
+                        }
+                      ]
+                      boundingObject USE %<=inertialShape>%
+                    }
+                    BallJoint {
+                      jointParameters BallJointParameters {
+                        anchor %<=TRAP.x>% %<=TRAP.y>% %<=TRAP.z>%
+                        staticFriction 1
+                      }
+                      endPoint SolidReference {
+                        solidName "%<=tieRodName>%"
+                      }
+                    }
+                    %< if(useMcphereson){>%
+                          DEF %<=strutName>% SliderJoint{
+                              jointParameters JointParameters{
+                              axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
+                              anchor %<=myUBJ.x>% %<=myUBJ.y>% %<=myUBJ.z>%
+                              }
+                            endPoint DEF %<=strutSolid>% Solid {
+                                  children [
+                                    DEF %<=strutShape>% Shape {
+                                      appearance PBRAppearance {
+                                      metalness 0
+                                      baseColor 0.1 0.1 0.1
+                                      }
+                                      geometry IndexedFaceSet {
+                                        coord Coordinate {
+                                        point [
+                                        %< for (let i = 0; i < strut.vertices.length; ++i) { >%
+                                        %<= strut.vertices[i][0] >% %<= strut.vertices[i][1] >% %<= strut.vertices[i][2] >%
+                                        %< } >%
+                                      ]
+                                    }
+                                    coordIndex [
+                                    %<for (let i = 0; i < strut.coordIndices.length; i=i+3) { >%
+                                    %<= strut.coordIndices[i][0] >% %<= strut.coordIndices[i][1] >% %<= strut.coordIndices[i][2] >% -1
+                                    %<= strut.coordIndices[i+1][0] >% %<= strut.coordIndices[i+1][1] >% %<= strut.coordIndices[i+1][2] >% -1
+                                    %<}>%
+                                  ]
+                                }
+                              }
+                            ]
+                            name "strut"
+                            boundingObject USE %<=strutShape>%
+                            physics Physics {
+                              }
+                            }
+                          }
+                    %<}
+                      else
+                      {>%
+                      
+                    BallJoint{
+                        jointParameters BallJointParameters {
+                        anchor %<=myUBJ.x>% %<=myUBJ.y>% %<=myUBJ.z>%
+                        staticFriction 1
+                      }
+                      endPoint SolidReference {
+                      solidName "%<=upperArmName>%"
+                        }
+                      }
+                      %<}>%
+
+                    DEF %<=wheelHingeName>% HingeJoint {
+                      jointParameters HingeJointParameters {
+                        axis 0 1 0
+                        anchor IS WheelAnchor 
+                      }
+                      device [
+                        RotationalMotor {
+                          name "%<=driveMotorName>%"
+                          maxVelocity 10000
+                          maxTorque 10000
+                        }
+                        Brake {
+                          name "%<=brakeName>%"
+                        }
+                        PositionSensor {
+                          name "%<=wheelEncoderName>%"
+                        }                      
+                      ]
+                      endPoint DEF %<=wheelName>% Solid {
+                        translation IS WheelAnchor
+                        rotation 0.8232371993768892 0.4015825905983689 -0.40126292688260995 1.7633106158223433
+                        children [
+                          Shape  {
+                            appearance TireRubber {
+                              textureTransform TextureTransform {
+                                rotation 1
+                              }
+                            }
+                            geometry DEF %<=wheelShape>% Cylinder {
+                              height %<=0.98*wheelWidth>%
+                              radius %<=0.98*wheelRadius>%
+                            }
+                          }
+                          DEF %<=wheelForceSensorDEF>% TouchSensor{
+                            type "force-3d"
+                            name "%<=wheelForceSensorName>%"
+                            contactMaterial "%<=contactName>%"
+                            lookupTable[-500000 -500000 0, 500000 500000 0]
+                            resolution -1
+                            physics Physics{
+                              mass 0.1
+                            }
+                            boundingObject DEF %<=tireShapeDEF>% Shape{
+                              geometry Cylinder{
+                                height %<=wheelWidth>%
+                                radius %<=wheelRadius>%
+                              }
+                            }
+                          }
+                        ]
+                      contactMaterial "%<=contactName>%"
+                        boundingObject USE  %<=wheelShape>%
+                        physics Physics {
+                          mass IS wheelMass
+                        }
+                        name "%<=wheelName>%"
+                      }
+                    }
+                    DEF %<=uprightShape>% Shape {
+                      appearance PBRAppearance {
+                      }
+                      geometry IndexedFaceSet {
+                      coord Coordinate {
+                          point [
+                              %< for (let i = 0; i < myUpright.vertices.length; ++i) { >%
+                              %<= myUpright.vertices[i][0] >% %<= myUpright.vertices[i][1] >% %<= myUpright.vertices[i][2] >%
+                              %< } >%
+                          ]
+                      }
+                      coordIndex [
+                          %<for (let i = 0; i < myUpright.coordIndices.length; i=i+3) { >%
+                          %<= myUpright.coordIndices[i][0] >% %<= myUpright.coordIndices[i][1] >% %<= myUpright.coordIndices[i][2] >% -1
+                          %<= myUpright.coordIndices[i+1][0] >% %<= myUpright.coordIndices[i+1][1] >% %<= myUpright.coordIndices[i+1][2] >% -1
+                          %<}>%
+                      ]
+                      }
+                    }
+                  ]
+                  name "%<=uprightName>%"
+                  boundingObject USE %<=uprightShape>%
+                  physics Physics {
+                  }
+                }
+              }
+              DEF %<=lowerArmShape>% Shape {
                 appearance PBRAppearance {
                 }
                 geometry IndexedFaceSet {
                 coord Coordinate {
                     point [
-                        %< for (let i = 0; i < UA.vertices.length; ++i) { >%
-                        %<= UA.vertices[i][0] >% %<= UA.vertices[i][1] >% %<= UA.vertices[i][2] >%
+                        %< for (let i = 0; i < LA.vertices.length; ++i) { >%
+                        %<= LA.vertices[i][0] >% %<= LA.vertices[i][1] >% %<= LA.vertices[i][2] >%
                         %< } >%
                     ]
                 }
                 coordIndex [
-                    %<for (let i = 0; i < UA.coordIndices.length; i=i+3) { >%
-                    %<= UA.coordIndices[i][0] >% %<= UA.coordIndices[i][1] >% %<= UA.coordIndices[i][2] >% -1
-                    %<= UA.coordIndices[i+1][0] >% %<= UA.coordIndices[i+1][1] >% %<= UA.coordIndices[i+1][2] >% -1
+                    %<for (let i = 0; i < LA.coordIndices.length; i=i+3) { >%
+                    %<= LA.coordIndices[i][0] >% %<= LA.coordIndices[i][1] >% %<= LA.coordIndices[i][2] >% -1
+                    %<= LA.coordIndices[i+1][0] >% %<= LA.coordIndices[i+1][1] >% %<= LA.coordIndices[i+1][2] >% -1
                     %<}>%
                 ]
                 }
               }
             ]
-            name "upperA_solid"
-            boundingObject USE %<=upperArmShape>%
+            boundingObject USE %<=lowerArmShape>%
             physics Physics {
               density -1
               mass 1
             }
           }
-      }
-      %<}>%
-
-      
-      DEF %<=lowerArm>% HingeJoint {
-        jointParameters HingeJointParameters {
-          axis %<=axis_lower.x>% %<=axis_lower.y>% %<=axis_lower.z>%
-          anchor %<=anchor_lower.x>% %<=anchor_lower.y>% %<=anchor_lower.z>%
-          staticFriction 10
         }
-        device [
-          RotationalMotor {
-            name "%<=suspensionMotorName>%"
-            controlPID %<=Kp_LA>% %<=Kd_LA>% 0
-            maxTorque 1000000
-          }
-          PositionSensor {
-            name "%<=suspensionSensorName>%"
-          }
-        ]
-        endPoint DEF %<=lowerArmSolid>% Solid {
-          #translation 1 1 0.1
-          rotation 0.9950371902099893 -0.09950371902099893 0 0
-          children [
-            BallJoint {
-              jointParameters BallJointParameters {
-                anchor %<=myLBJ.x>% %<=myLBJ.y>% %<=myLBJ.z>%
-                staticFriction 1
-              }
-              jointParameters2 JointParameters {
-              }
-              jointParameters3 JointParameters {
-                axis 1 0 0
-              }
-              device2 [
-                PositionSensor {
-                  name "%<=steerAngleSensorName>%"
-                }
-              ]
-              device3 [
-                PositionSensor {
-                  name "%<=camberAngleSensorName>%"
-                }
-              ]
-              endPoint DEF %<=upright>% Solid {
-                #translation 0.01 0.3 0.11
-                rotation 0 1 0 0
-                children [
-                  DEF angleSensor InertialUnit{
-                    name "imu"
-                    children[
-                      %<=inertialShape>% Shape {
-                        appearance PBRAppearance {
-                        }
-                        geometry Box {
-                          size 0.01 0.01 0.01
-                        }
-                      }
-                    ]
-                    boundingObject USE %<=inertialShape>%
-                  }
-                  BallJoint {
-                    jointParameters BallJointParameters {
-                      anchor %<=TRAP.x>% %<=TRAP.y>% %<=TRAP.z>%
-                      staticFriction 1
-                    }
-                    endPoint SolidReference {
-                      solidName "tierod"
-                    }
-                  }
-                  
 
-                  BallJoint {
-                    jointParameters BallJointParameters {
-                      anchor %<=myUBJ.x>% %<=myUBJ.y>% %<=myUBJ.z>%
-                      staticFriction 1
-
-                    }
-                    endPoint SolidReference {
-                      %< if(useMcphereson){>%
+        %< if(useMcphereson){>%
+            DEF HingeJoint {
+            jointParameters HingeJointParameters {
+            axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
+            anchor %<=mCPP.x>% %<=mCPP.y>% %<=mCPP.z>% 
+            staticFriction 10
+          }
+          endPoint SolidReference {
                         solidName "strut"
-                      %<}else{>%
-                      solidName "upperA_solid"
-                      %<}>%
-                    }
-                  }
-                  DEF %<=wheelHingeName>% HingeJoint {
-                    jointParameters HingeJointParameters {
-                      axis 0 1 0
-                      anchor IS WheelAnchor 
-                    }
-                    device [
-                      RotationalMotor {
-                        name "%<=driveMotorName>%"
-                        controlPID 1000 0 0
-                        maxVelocity 10000
-                        maxTorque 10000
                       }
-                      Brake {
-                        name "%<=brakeName>%"
-                      }
-                      PositionSensor {
-                        name "%<=wheelEncoderName>%"
-                      }                      
-                    ]
-                    endPoint DEF %<=wheelName>% Solid {
-                      translation IS WheelAnchor
-                      rotation 0.8232371993768892 0.4015825905983689 -0.40126292688260995 1.7633106158223433
-                      children [
-                        Shape  {
-                          appearance TireRubber {
-                            textureTransform TextureTransform {
-                              rotation 1
-                            }
-                          }
-                          geometry DEF %<=wheelShape>% Cylinder {
-                            height %<=0.98*wheelWidth>%
-                            radius %<=0.98*wheelRadius>%
-                          }
-                        }
-                        DEF %<=wheelForceSensorDEF>% TouchSensor{
-                          type "force-3d"
-                          name "%<=wheelForceSensorName>%"
-                          contactMaterial "%<=contactName>%"
-                          lookupTable[-500000 -500000 0, 500000 500000 0]
-                          resolution -1
-                          physics Physics{
-                            mass 0.1
-                          }
-                          boundingObject DEF %<=tireShapeDEF>% Shape{
-                            geometry Cylinder{
-                              height %<=wheelWidth>%
-                              radius %<=wheelRadius>%
-                            }
-                          }
-                        }
-                      ]
-                      contactMaterial "%<=contactName>%"
-                      boundingObject USE  %<=wheelShape>%
-                      physics Physics {
-                        mass IS wheelMass
-                      }
-                      name "%<=wheelName>%"
-                    }
-                  }
-                  DEF %<=uprightShape>% Shape {
-                    appearance PBRAppearance {
-                    }
-                    geometry IndexedFaceSet {
-                    coord Coordinate {
-                        point [
-                            %< for (let i = 0; i < myUpright.vertices.length; ++i) { >%
-                            %<= myUpright.vertices[i][0] >% %<= myUpright.vertices[i][1] >% %<= myUpright.vertices[i][2] >%
-                            %< } >%
-                        ]
-                    }
-                    coordIndex [
-                        %<for (let i = 0; i < myUpright.coordIndices.length; i=i+3) { >%
-                        %<= myUpright.coordIndices[i][0] >% %<= myUpright.coordIndices[i][1] >% %<= myUpright.coordIndices[i][2] >% -1
-                        %<= myUpright.coordIndices[i+1][0] >% %<= myUpright.coordIndices[i+1][1] >% %<= myUpright.coordIndices[i+1][2] >% -1
-                        %<}>%
-                    ]
-                    }
-                  }
-                ]
-                name "upright"
-                boundingObject USE %<=uprightShape>%
-                physics Physics {
-                }
-              }
             }
-            DEF %<=lowerArmShape>% Shape {
-              appearance PBRAppearance {
-              }
-              geometry IndexedFaceSet {
-              coord Coordinate {
-                  point [
-                      %< for (let i = 0; i < LA.vertices.length; ++i) { >%
-                      %<= LA.vertices[i][0] >% %<= LA.vertices[i][1] >% %<= LA.vertices[i][2] >%
-                      %< } >%
-                  ]
-              }
-              coordIndex [
-                  %<for (let i = 0; i < LA.coordIndices.length; i=i+3) { >%
-                  %<= LA.coordIndices[i][0] >% %<= LA.coordIndices[i][1] >% %<= LA.coordIndices[i][2] >% -1
-                  %<= LA.coordIndices[i+1][0] >% %<= LA.coordIndices[i+1][1] >% %<= LA.coordIndices[i+1][2] >% -1
-                  %<}>%
-              ]
-              }
-            }
-          ]
-          boundingObject USE %<=lowerArmShape>%
-          physics Physics {
-            density -1
-            mass 1
-          }
-        }
+        %<}>%
+
+
+      ]#end  corner solid children
+
+      physics Physics{
+
       }
-    ]#end  corner solid children
-
-    physics Physics{
-
-    }
-  }#end corner solid
+    }#end corner solid
 }#end proto

@@ -13,9 +13,9 @@
   "wheel_anchor":[0,0.4,0.1],
   "tire_radius": 0.25,
   "tire_width": 0.2,
-  "spring_rate": 5000,
-  "damping_rate": 200,
-  "anti_rollbar_stiffness": 800,
+  "spring_rate": 32000,
+  "damping_rate": 20,
+  "anti_rollbar_stiffness": 0,
   "anti_rollbar_lever_arm":0.3,
   "wheel_mass": 20,
   "use_mcpherson": false,
@@ -23,3 +23,4 @@
   "tire_type": "linear Saturated",
   "tire_data_location": "location" 
 }
+  
