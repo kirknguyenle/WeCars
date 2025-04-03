@@ -21,6 +21,8 @@
   "use_mcpherson": false,
   "mcpherson_strut_pickup": [0,0.1,0.5],
   "tire_type": "linear Saturated",
-  "tire_data_location": "location" 
+  "tire_data_location": "location" ,
+  "cornering_stiffness": 10000,
+  "tractive_stiffness": 10000
 }
   

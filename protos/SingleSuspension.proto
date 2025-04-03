@@ -57,6 +57,7 @@ PROTO singleSuspension [
   let driveMotorName = fields.cornerID.value+"_drive_motor";
   let inertialUnit = fields.cornerID.value+"_inertial_sensor";
   let inertialShape = fields.cornerID.value+"_inertial_shape";
+  let inertialName = fields.cornerID.value+"_inertial_name";
   let wheelForceSensorName;
   let wheelForceSensorDEF;
   let tireShapeDEF;
@@ -402,7 +403,7 @@ PROTO singleSuspension [
           device [
             LinearMotor{
             name IS steerMotorName
-              controlPID  100 70 0
+              controlPID  1000 70 20
               maxForce    1000000
             }
           ]
@@ -559,7 +560,7 @@ PROTO singleSuspension [
                   children [
                     DEF angleSensor InertialUnit{
                       translation %<=myIMU.x>% %<=myIMU.y>% %<=myIMU.z>%
-                      name "imu"
+                      name "%<=inertialName>%"
                       children[
                         DEF %<=inertialShape>% Shape {
                           appearance PBRAppearance {
@@ -613,7 +614,7 @@ PROTO singleSuspension [
                                 }
                               }
                             ]
-                            name "strut"
+                            name "%<=strutName>%"
                             boundingObject USE %<=strutShape>%
                             physics Physics {
                               }
@@ -684,7 +685,7 @@ PROTO singleSuspension [
                             }
                           }
                         ]
-                      contactMaterial "%<=contactName>%"
+                        contactMaterial "%<=contactName>%"
                         boundingObject USE  %<=wheelShape>%
                         physics Physics {
                           mass IS wheelMass
@@ -754,7 +755,7 @@ PROTO singleSuspension [
             staticFriction 10
           }
           endPoint SolidReference {
-                        solidName "strut"
+                        solidName "%<=strutName>%"
                       }
             }
         %<}>%
