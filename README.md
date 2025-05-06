@@ -12,7 +12,7 @@ intends to allow individuals to gain understanding through visualization and sim
         C) Roll and Pitch center adjustment scripts (Planned)
 
 2) Dynamic Tyre Model simulation support. Linear, nonlinear, and 3D tabular tires are supported. (May include support for other models in the future)
-3) Procedural Vehicle Generation from JSON Files (Planned)
+3) Procedural Vehicle Generation from JSON Files 
 4) Single point preview real time vehicle simulation (Planned)
 5) Generation of G-G diagrams, Milliken Moment Method diagrams, etc (Planned)
 6) Racetrack Laptime Simulation (Planned)
