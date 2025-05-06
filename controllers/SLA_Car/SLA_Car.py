@@ -27,8 +27,13 @@ with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2.json')
 
 trackwidth = data["trackwidth"]
 wheelbase = data["wheelbase"]
+wheel_radius = data["tire_radius"]
 tire_type = data["tire_type"]
 cornering_stiffness = data["cornering_stiffness"]
+magic_formula_constants = data["magic_formula_constants"]
+
+rundrive = True
+runsteer = False
 
 mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"_contact"),
             robot.getFromDef(cO.createLocationString(-1,1)+"_contact")],
@@ -98,6 +103,10 @@ imu.enable(timestep)
 
 for i in range(2):
     for j in range(2):
+        loads[i][j].enable(50)
+
+for i in range(2):
+    for j in range(2):
         drives[i][j].setPosition(float('inf'))
         drives[i][j].setVelocity(0.0)
         #drives[i][j].setAvailableTorque(20)
@@ -105,7 +114,7 @@ for i in range(2):
 for i in range(2):
     for j in range(2):
         suspension[i][j].setPosition(0)
-        suspension[i][j].setAvailableTorque(5000)
+        suspension[i][j].setAvailableTorque(0)
 
 
 for i in range(2):
@@ -126,6 +135,7 @@ wheelEnc = [[0,0],[0,0]]
 wheelLast = [[0,0],[0,0]]
 wheelDelta = [[0,0],[0,0]]
 wheelVel = [[0,0],[0,0]]
+linWheelVel = [[0,0],[0,0]]
 
 steerLeftRaw = [0,0,0]
 steerRightRaw = [0,0,0]
@@ -138,6 +148,19 @@ speed2D = [0,0]
 speedRelative = [0,0]
 relativeVelAngle = 0
 
+frontLeftForces = [0,0,0]
+frontRightForces = [0,0,0]
+rearLeftForces = [0,0,0]
+rearRightForces = [0,0,0]
+
+
+
+mat = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
+
+rawLoads = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
+
+verticalLoads = [[0,0],[0,0]]
+
 while robot.step(timestep) != -1:
     simtime += timestep/1000
     drives[0][0].setAvailableTorque(0)
@@ -149,6 +172,36 @@ while robot.step(timestep) != -1:
                 wheelDelta[j][i] = wheelEnc[j][i]-wheelLast[j][i]
                 wheelVel[j][i] = wheelDelta[1][i]*1000
                 wheelLast[j][i] = wheelEnc[j][i]
+
+    for i  in range(2):
+        for j in range(2):
+            linWheelVel[i][j] = wheelVel[i][j]*wheel_radius
+            
+
+    for i in range(2):
+        for j in range(2):
+            local_var = loads[i][j].getValues()
+            rawLoads[i][j] = [local_var[0], local_var[1], local_var[2]]
+
+    
+    for i in range(2):
+        for j in range(2):
+            mat[i][j] = th.rotationMatrix3D(wheelEnc[i][j])
+
+    frontLeftForces = np.matmul(mat[0][0],rawLoads[0][0])
+    frontRightForces = np.matmul(mat[0][1],rawLoads[0][1])
+    rearLeftForces = np.matmul(mat[1][0],rawLoads[1][0])
+    rearRightForces = np.matmul(mat[1][1],rawLoads[1][1])
+    print(simtime)
+    print('---------------------------')
+    print(rearRightForces[1]+rearLeftForces[1]+frontRightForces[1]+frontLeftForces[1])
+    print('---------------------------')
+
+    verticalLoads[0][0] = frontLeftForces[1]
+    verticalLoads[0][1] = frontRightForces[1]
+    verticalLoads[1][0] = rearLeftForces[1]
+    verticalLoads[1][1] = rearRightForces[1]
+    
 
     imuData = imu.getRollPitchYaw()
     worldYaw = imuData[2]
@@ -176,16 +229,25 @@ while robot.step(timestep) != -1:
     for i in range(2):
         slip[1][i] = relativeVelAngle
     
-    print(round(slip[0][0],2))
 
     for i in range(2):
         for j in range(2):
             match tire_type:
                 case "linear Saturated":
-                  SL = th.simpleLinearSaturatedLong(wheelVel[i][j],speedRelative[0],cornering_stiffness, cornering_stiffness*0.9)
+                  SL = th.simpleLinearSaturatedLong(linWheelVel[i][j],speedRelative[0],cornering_stiffness, cornering_stiffness*0.9)
                   S = th.simpleLinearSaturated(speedRelative[0], cornering_stiffness, slip[i][j], cornering_stiffness*0.9)
                   mc_fields[i][j].setMFFloat(1, S)
-                  mc_fields[i][j].setMFFloat(0,SL)
+                  mc_fields[i][j].setMFFloat(0, SL)
+                case "magic formula":
+                    S = th.simpleMFLat(magic_formula_constants[0], magic_formula_constants[1], magic_formula_constants[2], magic_formula_constants[3], slip[i][j], speedRelative[0])
+                    SL = th.simpleMFLong(magic_formula_constants[0], magic_formula_constants[1], magic_formula_constants[2], magic_formula_constants[3], linWheelVel[i][j], speedRelative[0])
+                    mc_fields[i][j].setMFFloat(1, S)
+                    mc_fields[i][j].setMFFloat(0, SL)
+                case "magic formula Fz":
+                    S = th.mfzLat(magic_formula_constants[0], magic_formula_constants[1], magic_formula_constants[2], magic_formula_constants[3], slip[i][j], speedRelative[0], verticalLoads[i][j])
+                    SL = th.mfzLong(magic_formula_constants[0], magic_formula_constants[1], magic_formula_constants[2], magic_formula_constants[3], linWheelVel[i][j], speedRelative[0], verticalLoads[i][j])
+                    mc_fields[i][j].setMFFloat(1, S)
+                    mc_fields[i][j].setMFFloat(0, SL)
                 case _:
                   S = th.simpleLinearSaturated(speedRelative[0], cornering_stiffness, slip[i][j], cornering_stiffness*0.9)
                   mc_fields[i][j].setMFFloat(1, S)    
@@ -199,32 +261,33 @@ while robot.step(timestep) != -1:
 
 
 
-
-    if(simtime > 1):
-        steeringRack[0].setPosition(0.025)
-        steeringRack[1].setPosition(0.025)
-
-    if(simtime > 2):
-        steeringRack[0].setPosition(0.04)
-        steeringRack[1].setPosition(0.04)
-    if(simtime > 3):
-        steeringRack[0].setPosition(-0.04)
-        steeringRack[1].setPosition(-0.04)
+    if runsteer == True:
+        if(simtime > 1.7):
+            steeringRack[0].setPosition(0.025)
+            steeringRack[1].setPosition(0.025)
+    
+        if(simtime > 3.7):
+            steeringRack[0].setPosition(0.04)
+            steeringRack[1].setPosition(0.04)
+        if(simtime > 4.7):
+            steeringRack[0].setPosition(-0.04)
+            steeringRack[1].setPosition(-0.04)
 
     #driveRPM = driveVelocity/0.25
     #if(round(simtime*100,2)%25==0):
         #speeds = cO.simulateOpenDifferential(driveRPM, diffRatio)
-    if simtime > 1.5:
-        drives[1][0].setTorque(100)
-        drives[1][1].setTorque(100)
+    if rundrive == True:
+        if simtime > 1:
+            drives[1][0].setTorque(40)
+            drives[1][1].setTorque(40)
+    
+        if simtime > 1.3:
+            drives[1][0].setTorque(0)
+            drives[1][1].setTorque(0)
 
-    if simtime > 2.5:
-        drives[1][0].setTorque(150)
-        drives[1][1].setTorque(150)
-
-        driveVelocity = 4
 
 
+    
 
     
 

@@ -36,7 +36,7 @@ timestep = int(robot.getBasicTimeStep())
 drive = robot.getDevice('frontleft_drive_motor')
 motor = robot.getDevice('frontleft_suspension_motor')
 stmotor = robot.getDevice('steer_left')
-tire_sensor = robot.getDevice('imu')
+tire_sensor = robot.getDevice('frontleft_inertial_name')
 steer_sensor = robot.getDevice('frontleft_steerSensor')
 tire_sensor.enable((timestep))
 steer_sensor.enable((timestep))
@@ -70,8 +70,8 @@ while robot.step(timestep) != -1:
     simtime +=timestep/100.0
     lastData = data
     data = tire_sensor.getRollPitchYaw()
-    
-    
+    motor.setAvailableTorque(400)
+    stmotor.setAvailableForce(0)
     
     #total of 400 datapoints per test
     jounceRange = np.arange(-0.35, 0.35, 0.0025)

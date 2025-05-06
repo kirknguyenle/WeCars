@@ -5,6 +5,8 @@ import os.path
 import sys
 import math 
 import json
+
+s.path.insert(0,r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\extra_scripts\SupportScripts')
 import carOrganizer as cO
 
 #Instantiate Supervisor
@@ -38,10 +40,10 @@ height = 0.2
 
 #Generate Contact Properties
 
-contact_field.importMFNodeFromString(0,'DEF frontleft_contact ContactProperties { material1 "frontleft_contact" softCFM 0.0001 softERP 0.1 coulombFriction 8 bounce 0.1 maxContactJoints 8 forceDependentSlip [0 0]}')
-contact_field.importMFNodeFromString(0,'DEF frontright_contact ContactProperties { material1 "frontright_contact" softCFM 0.0001 softERP 0.1 coulombFriction 8 bounce 0.1 maxContactJoints 8 forceDependentSlip [0 0]}')
-contact_field.importMFNodeFromString(0,'DEF rearleft_contact ContactProperties { material1 "rearleft_contact" softCFM 0.0001 softERP 0.1 coulombFriction 8 bounce 0.1 maxContactJoints 8 forceDependentSlip [0 0]}')
-contact_field.importMFNodeFromString(0,'DEF rearright_contact ContactProperties { material1 "rearright_contact" softCFM 0.0001 softERP 0.1 coulombFriction 8 bounce 0.1 maxContactJoints 8 forceDependentSlip [0 0]}')
+contact_field.importMFNodeFromString(0,'DEF frontleft_contact ContactProperties { material1 "frontleft_contact" softCFM 0.00001 softERP 0.2 coulombFriction 8 bounce 0 maxContactJoints 8 forceDependentSlip [0 0]}')
+contact_field.importMFNodeFromString(0,'DEF frontright_contact ContactProperties { material1 "frontright_contact" softCFM 0.00001 softERP 0.2 coulombFriction 8 bounce 0 maxContactJoints 8 forceDependentSlip [0 0]}')
+contact_field.importMFNodeFromString(0,'DEF rearleft_contact ContactProperties { material1 "rearleft_contact" softCFM 0.00001 softERP 0.2 coulombFriction 8 bounce 0 maxContactJoints 8 forceDependentSlip [0 0]}')
+contact_field.importMFNodeFromString(0,'DEF rearright_contact ContactProperties { material1 "rearright_contact" softCFM 0.00001 softERP 0.2 coulombFriction 8 bounce 0 maxContactJoints 8 forceDependentSlip [0 0]}')
 
 mUPF = data["upper_front_location"]
 mUPR = data["upper_rear_location"]

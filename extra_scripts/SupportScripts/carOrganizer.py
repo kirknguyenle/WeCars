@@ -53,7 +53,7 @@ def simulateOpenDifferential(inputSpeed, ratio):
     return [leftSpeed,rightSpeed]
 
 def mirrorY(vec):
-    u = []
+    u = [0,0,0]
     u[0] = vec[0]
     u[1] = -vec[1]
     u[2] = vec[2]

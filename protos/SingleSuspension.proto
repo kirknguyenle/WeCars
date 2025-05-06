@@ -40,7 +40,7 @@ PROTO singleSuspension [
   let steerRackName = fields.cornerID.value+"_steering_rack";
   let steerRackSolidName = fields.cornerID.value+"_steering_rack_solid";
   let steerRackShape = fields.cornerID.value+"_steering_rack_shape";
-  console.log(steerRackShape)
+  let steerBoxName = fields.cornerID.value+"_steer_box_name";
   let steeringMotorName = fields.cornerID.value;
   let tieRodName = fields.cornerID.value+"_tie_rod_name";
   let tieRodSolidName = fields.cornerID.value+"_tie_rod_solid";
@@ -403,7 +403,7 @@ PROTO singleSuspension [
           device [
             LinearMotor{
             name IS steerMotorName
-              controlPID  1000 70 20
+              controlPID  1000 2 20
               maxForce    1000000
             }
           ]
@@ -457,7 +457,7 @@ PROTO singleSuspension [
                 }
               }
             ]
-            name "steering_rack"
+            name "%<=steerBoxName>%"
             boundingObject USE %<=steerRackShape>%
             physics Physics {
             }
@@ -475,8 +475,8 @@ PROTO singleSuspension [
         DEF %<=upperArm>% HingeJoint {
             jointParameters HingeJointParameters {
               anchor %<=anchor_upper.x>% %<=anchor_upper.y>% %<=anchor_upper.z>%
-              stopERP 0.0001
-              stopCFM 0.0000001
+              stopERP 0.6
+              stopCFM 0.00001
             }
             endPoint DEF %<=upperArmSolid>% Solid {
               children [
@@ -517,15 +517,17 @@ PROTO singleSuspension [
           jointParameters HingeJointParameters {
             axis %<=axis_lower.x>% %<=axis_lower.y>% %<=axis_lower.z>%
             anchor %<=anchor_lower.x>% %<=anchor_lower.y>% %<=anchor_lower.z>%
-            staticFriction 10
-            stopERP 0.0001
-            stopCFM 0.0000001
+            springConstant %<=Kp_LA>%
+            dampingConstant %<=Kd_LA>%
+            staticFriction 1
+            stopERP 0.6
+            stopCFM 0.00001
           }
           device [
             RotationalMotor {
               name "%<=suspensionMotorName>%"
-              controlPID %<=Kp_LA>% %<=Kd_LA>% 0
-              maxTorque 1000000
+              controlPID 0 0 0 #%<=Kp_LA>% %<=Kd_LA>% 0
+              maxTorque 0 #100000
             }
             PositionSensor {
               name "%<=suspensionSensorName>%"
@@ -537,7 +539,7 @@ PROTO singleSuspension [
               BallJoint {
                 jointParameters BallJointParameters {
                   anchor %<=myLBJ.x>% %<=myLBJ.y>% %<=myLBJ.z>%
-                  staticFriction 1
+                  staticFriction 1  
                 }
                 jointParameters2 JointParameters {
                 }
@@ -752,7 +754,7 @@ PROTO singleSuspension [
             jointParameters HingeJointParameters {
             axis %<=axis_strut.x>% %<=axis_strut.y>% %<=axis_strut.z>%
             anchor %<=mCPP.x>% %<=mCPP.y>% %<=mCPP.z>% 
-            staticFriction 10
+            staticFriction 1
           }
           endPoint SolidReference {
                         solidName "%<=strutName>%"
