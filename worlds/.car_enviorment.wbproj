@@ -4,7 +4,7 @@ simulationViewPerspectives: 000000ff0000000100000002000001e500000556010000000201
 sceneTreePerspectives: 000000ff0000000100000003000000260000048f000000fa0100000002010000000200
 maximizedDockId: -1
 centralWidgetVisible: 1
-renderingMode: PLAIN
+renderingMode: WIREFRAME
 orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: CoordinateSystem::AllBoundingObjects::ContactPoints::ConnectorAxes::RangeFinderFrustums::JointAxes

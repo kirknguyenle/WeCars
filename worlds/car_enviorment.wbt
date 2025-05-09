@@ -8,10 +8,9 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/TireRubber.proto"
 
 DEF WorldInfo WorldInfo {
-  CFM 1e-09
-  ERP 0.6
+  gravity 10
+  CFM 1e-08
   basicTimeStep 1
-  FPS 120
   defaultDamping Damping {
   }
   lineScale 1

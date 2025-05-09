@@ -91,6 +91,10 @@ suspension = [[robot.getDevice(cO.createLocationString(1,1)+"_suspension_motor")
             [robot.getDevice(cO.createLocationString(1,-1)+"_suspension_motor"),
              robot.getDevice(cO.createLocationString(-1,-1)+"_suspension_motor")]]
 
+brakes = [[robot.getDevice(cO.createLocationString(1,1)+"_brake"),
+            robot.getDevice(cO.createLocationString(-1,1)+"_brake")],
+            [robot.getDevice(cO.createLocationString(1,-1)+"_brake"),
+             robot.getDevice(cO.createLocationString(-1,-1)+"_brake")]]
 
 accel = robot.getDevice("accel")
 diff_cont = robot.getDevice("diffMan")
@@ -153,6 +157,10 @@ frontRightForces = [0,0,0]
 rearLeftForces = [0,0,0]
 rearRightForces = [0,0,0]
 
+worldYaw = 0
+lastYaw = 0 
+deltaYaw = 0
+yawVel = 0
 
 
 mat = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
@@ -161,16 +169,24 @@ rawLoads = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
 
 verticalLoads = [[0,0],[0,0]]
 
+testcounter = 0
+
 while robot.step(timestep) != -1:
     simtime += timestep/1000
     drives[0][0].setAvailableTorque(0)
     drives[0][1].setAvailableTorque(0)
-    if np.round(simtime*1000,0)%50 == 0: 
+
+
+    #brakes[0][0].setDampingConstant(9000)
+    #brakes[0][1].setDampingConstant(9000)
+
+    if np.round(simtime*1000,0)%50 == 0:
         for j in range(2):
             for i in range(2):
+                
                 wheelEnc[j][i] = wheelSensors[j][i].getValue()
                 wheelDelta[j][i] = wheelEnc[j][i]-wheelLast[j][i]
-                wheelVel[j][i] = wheelDelta[1][i]*1000
+                wheelVel[j][i] = (wheelDelta[1][i]/(50))*1000
                 wheelLast[j][i] = wheelEnc[j][i]
 
     for i  in range(2):
@@ -192,9 +208,10 @@ while robot.step(timestep) != -1:
     frontRightForces = np.matmul(mat[0][1],rawLoads[0][1])
     rearLeftForces = np.matmul(mat[1][0],rawLoads[1][0])
     rearRightForces = np.matmul(mat[1][1],rawLoads[1][1])
+
     print(simtime)
     print('---------------------------')
-    print(rearRightForces[1]+rearLeftForces[1]+frontRightForces[1]+frontLeftForces[1])
+    print(linWheelVel[0][0])
     print('---------------------------')
 
     verticalLoads[0][0] = frontLeftForces[1]
@@ -205,6 +222,10 @@ while robot.step(timestep) != -1:
 
     imuData = imu.getRollPitchYaw()
     worldYaw = imuData[2]
+    deltaYaw = worldYaw-lastYaw
+    lastYaw = worldYaw
+
+
 
     rotationMat = [[np.cos(worldYaw),np.sin(worldYaw)],
                    [-np.sin(worldYaw),np.cos(worldYaw)]]
@@ -215,6 +236,10 @@ while robot.step(timestep) != -1:
         speed2D[i] = rawSpeed[i]
 
     speedRelative = np.matmul(rotationMat, speed2D)
+
+
+
+
     relativeVelAngle = np.arctan(speedRelative[1]/speedRelative[0])
 
 
@@ -278,10 +303,10 @@ while robot.step(timestep) != -1:
         #speeds = cO.simulateOpenDifferential(driveRPM, diffRatio)
     if rundrive == True:
         if simtime > 1:
-            drives[1][0].setTorque(40)
-            drives[1][1].setTorque(40)
+            drives[1][0].setTorque(600)
+            drives[1][1].setTorque(600)
     
-        if simtime > 1.3:
+        if simtime > 4:
             drives[1][0].setTorque(0)
             drives[1][1].setTorque(0)
 

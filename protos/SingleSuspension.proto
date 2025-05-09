@@ -657,7 +657,7 @@ PROTO singleSuspension [
                       ]
                       endPoint DEF %<=wheelName>% Solid {
                         translation IS WheelAnchor
-                        rotation 0.8232371993768892 0.4015825905983689 -0.40126292688260995 1.7633106158223433
+                        rotation 1.0 0.0 -0.0 1.57
                         children [
                           Shape  {
                             appearance TireRubber {
@@ -666,8 +666,8 @@ PROTO singleSuspension [
                               }
                             }
                             geometry DEF %<=wheelShape>% Cylinder {
-                              height %<=0.98*wheelWidth>%
-                              radius %<=0.98*wheelRadius>%
+                              height %<=0.9*wheelWidth>%
+                              radius %<=0.9*wheelRadius>%
                             }
                           }
                           DEF %<=wheelForceSensorDEF>% TouchSensor{
