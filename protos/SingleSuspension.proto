@@ -403,7 +403,7 @@ PROTO singleSuspension [
           device [
             LinearMotor{
             name IS steerMotorName
-              controlPID  1000 2 20
+              controlPID  1000 2 200
               maxForce    1000000
             }
           ]

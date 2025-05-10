@@ -12,15 +12,16 @@ import matplotlib.pyplot as mpl
 import matplotlib.animation as ani
 
 
+
 run = dt.now()
 runString= run.strftime("%d-%m-%Y-%H-%M-%S")
 
-save_path = (r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\testData")
-filename = (r"SuspGraph" + runString)
+save_path = (r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\test_data")
+filename = (r"SteerGen" + runString)
 location = os.path.join(save_path, filename+".txt")
 print(location)
-#file = open(location, "w")
-#file.write("#Bump,Camber,Caster,Toe,SteerAngle,SteerRack \r\n")
+file = open(location, "w")
+file.write("SteerAngle, RackExtension \r\n")
 
 breakline = "9,9,9,9,9,"+("9"*29)
 # create the Robot instance.b
@@ -64,28 +65,37 @@ mdif = 0
 # - perform simulation steps until Webots is stopping the controller
 
 lastTime = 0
+steerRange = np.arange(-0.05, 0.0525, 0.00025)
+stmotor.setAvailableForce(400)
+stmotor.setPosition(-0.05)
+
+
 
 while robot.step(timestep) != -1:
     simtime +=timestep/1000.0
-    if np.round(simtime-lastTime * 1000, 0)%10 == 0:
-        counter += 1
+    if simtime > 1:
+        if np.round(simtime-lastTime * 1000, 0)%10 == 0:
+            counter += 1
 
 
     lastTime = simtime 
     lastData = data
     data = tire_sensor.getRollPitchYaw()
-    motor.setAvailableTorque(400)
-    stmotor.setAvailableForce(400)
 
     print(counter)
     
     #total of 400 datapoints per test
     #jounceRange = np.arange(-0.35, 0.35, 0.0025)
-    steerRange = np.arange(-0.05, 0.05, 0.00025)
     
-    if counter < 400:
-        stmotor.setPosition(steerRange[counter])
-
+    
+    if simtime > 1:
+        if counter < 402:
+            stmotor.setPosition(steerRange[counter])
+            file.write(
+                str(data[2]) + ","+
+                str(steerRange[counter])+
+                "\r\n"
+            )
   
 
     #if simtime <5 :

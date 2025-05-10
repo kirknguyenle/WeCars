@@ -22,6 +22,10 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 DEF car Robot {
+  children [
+    DEF frontleft_corner_anchor singleSuspension {
+    }
+  ]
   name "car"
   controller "SuspGraph"
   supervisor TRUE

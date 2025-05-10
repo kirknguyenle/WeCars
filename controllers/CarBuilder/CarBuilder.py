@@ -23,7 +23,7 @@ simtime = 0
 
 #Read Trackwidth, WheelBase
 #Read SuspensionData 
-with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2.json') as f:
+with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2\mr2.json') as f:
     data = json.load(f)
 
 #Calculate "SingleSuspension" Width 

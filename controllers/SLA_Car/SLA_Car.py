@@ -22,7 +22,7 @@ print(location)
 robot = Supervisor()
 timestep = int(robot.getBasicTimeStep())
 
-with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2.json') as f:
+with open(r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2\mr2.json') as f:
     data = json.load(f)
 
 trackwidth = data["trackwidth"]
@@ -33,7 +33,7 @@ cornering_stiffness = data["cornering_stiffness"]
 magic_formula_constants = data["magic_formula_constants"]
 
 rundrive = True
-runsteer = False
+runsteer = True
 
 mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"_contact"),
             robot.getFromDef(cO.createLocationString(-1,1)+"_contact")],
@@ -150,7 +150,9 @@ rotationMat = [[0,0],[0,0]]
 rawSpeed = [0,0,0]
 speed2D = [0,0]
 speedRelative = [0,0]
-relativeVelAngle = 0
+
+cornerVelocities = [[[0,0],[0,0]],
+                    [[0,0],[0,0]]]
 
 frontLeftForces = [0,0,0]
 frontRightForces = [0,0,0]
@@ -160,12 +162,14 @@ rearRightForces = [0,0,0]
 worldYaw = 0
 lastYaw = 0 
 deltaYaw = 0
-yawVel = 0
+yawDot = 0
 
+mat = [[[0,0,0],[0,0,0],[0,0,0]],
+       [[0,0,0],[0,0,0],[0,0,0]],
+       [[0,0,0],[0,0,0],[0,0,0]]]
 
-mat = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
-
-rawLoads = [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]]
+rawLoads = [[[0,0,0],[0,0,0]],
+            [[0,0,0],[0,0,0]]]
 
 verticalLoads = [[0,0],[0,0]]
 
@@ -221,9 +225,11 @@ while robot.step(timestep) != -1:
     
 
     imuData = imu.getRollPitchYaw()
-    worldYaw = imuData[2]
-    deltaYaw = worldYaw-lastYaw
-    lastYaw = worldYaw
+    if np.round(simtime*1000,0)%50 == 0:
+        worldYaw = imuData[2]
+        deltaYaw = worldYaw-lastYaw
+        yawDot = (deltaYaw/50)*1000
+        lastYaw = worldYaw
 
 
 
@@ -237,11 +243,12 @@ while robot.step(timestep) != -1:
 
     speedRelative = np.matmul(rotationMat, speed2D)
 
-
-
-
+    cornerVelocities[0][0] = th.velocityTransform2D(speedRelative, yawDot, [wheelbase/2, trackwidth/2])
+    cornerVelocities[0][1] = th.velocityTransform2D(speedRelative, yawDot, [wheelbase/2, -trackwidth/2])
+    cornerVelocities[1][0] = th.velocityTransform2D(speedRelative, yawDot, [-wheelbase/2, trackwidth/2])
+    cornerVelocities[1][1] = th.velocityTransform2D(speedRelative, yawDot, [-wheelbase/2, -trackwidth/2])
+    
     relativeVelAngle = np.arctan(speedRelative[1]/speedRelative[0])
-
 
     steerLeftRaw= steerSensors[0][0].getRollPitchYaw()
     steerRightRaw= steerSensors[0][1].getRollPitchYaw()
@@ -249,10 +256,10 @@ while robot.step(timestep) != -1:
     steerLeftAdj = steerLeftRaw[2]-worldYaw
     steerRightAdj = steerRightRaw[2]-worldYaw
 
-    slip[0][0] = relativeVelAngle-steerLeftAdj  
-    slip[0][1] = relativeVelAngle-steerRightAdj
+    slip[0][0] = np.arctan(cornerVelocities[0][0][1]/cornerVelocities[0][0][0])-steerLeftAdj  
+    slip[0][1] = np.arctan(cornerVelocities[0][1][1]/cornerVelocities[0][1][0])-steerRightAdj
     for i in range(2):
-        slip[1][i] = relativeVelAngle
+        slip[1][i] = np.arctan(cornerVelocities[1][i][1]/cornerVelocities[0][i][0])
     
 
     for i in range(2):
@@ -285,6 +292,7 @@ while robot.step(timestep) != -1:
     #radius = np.pow(vh,2)/np.round(accel_data[1],2)
 
 
+    #Steer System Identification: 
 
     if runsteer == True:
         if(simtime > 1.7):
@@ -303,13 +311,12 @@ while robot.step(timestep) != -1:
         #speeds = cO.simulateOpenDifferential(driveRPM, diffRatio)
     if rundrive == True:
         if simtime > 1:
-            drives[1][0].setTorque(600)
-            drives[1][1].setTorque(600)
+            drives[1][0].setTorque(250)
+            drives[1][1].setTorque(250)
     
         if simtime > 4:
-            drives[1][0].setTorque(0)
-            drives[1][1].setTorque(0)
-
+            drives[1][0].setTorque(400)
+            drives[1][1].setTorque(400)
 
 
     

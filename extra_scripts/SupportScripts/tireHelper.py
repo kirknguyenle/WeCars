@@ -78,4 +78,11 @@ def rotationMatrix3D(theta):
          [0, 0, 1]]
     return m
 
+def velocityTransform2D(v1, tdot, r):
+    cross = np.cross([0,0,tdot], [r[0],r[1],0])
+    x = v1[0] + cross[0]
+    y = v1[1] + cross[1]
+    return [x,y]
+
+
 
