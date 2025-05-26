@@ -35,6 +35,10 @@ magic_formula_constants = data["magic_formula_constants"]
 rundrive = True
 runsteer = True
 
+steer_angles, rack_extension = np.loadtxt(r"C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\car_files\mr2\mr2Steer.txt", delimiter=',', unpack=True)
+
+print(steer_angles)
+
 mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"_contact"),
             robot.getFromDef(cO.createLocationString(-1,1)+"_contact")],
             [robot.getFromDef(cO.createLocationString(1,-1)+"_contact"),
@@ -164,6 +168,9 @@ lastYaw = 0
 deltaYaw = 0
 yawDot = 0
 
+strRack = 0
+strA = 0
+
 mat = [[[0,0,0],[0,0,0],[0,0,0]],
        [[0,0,0],[0,0,0],[0,0,0]],
        [[0,0,0],[0,0,0],[0,0,0]]]
@@ -213,10 +220,8 @@ while robot.step(timestep) != -1:
     rearLeftForces = np.matmul(mat[1][0],rawLoads[1][0])
     rearRightForces = np.matmul(mat[1][1],rawLoads[1][1])
 
-    print(simtime)
-    print('---------------------------')
-    print(linWheelVel[0][0])
-    print('---------------------------')
+    #print(simtime)
+    #print('---------------------------')
 
     verticalLoads[0][0] = frontLeftForces[1]
     verticalLoads[0][1] = frontRightForces[1]
@@ -291,20 +296,25 @@ while robot.step(timestep) != -1:
 
     #radius = np.pow(vh,2)/np.round(accel_data[1],2)
 
+    strRack = np.interp(0, steer_angles, rack_extension)
+
+    print(strRack)
+    print('---------------------------')
+
+
+    steeringRack[0].setPosition(0)
+    steeringRack[1].setPosition(strRack)
 
     #Steer System Identification: 
 
-    if runsteer == True:
+    if runsteer == False:
         if(simtime > 1.7):
-            steeringRack[0].setPosition(0.025)
-            steeringRack[1].setPosition(0.025)
+            strA = 0.32
     
         if(simtime > 3.7):
-            steeringRack[0].setPosition(0.04)
-            steeringRack[1].setPosition(0.04)
+            strA = 0.48
         if(simtime > 4.7):
-            steeringRack[0].setPosition(-0.04)
-            steeringRack[1].setPosition(-0.04)
+            strA = -0.48
 
     #driveRPM = driveVelocity/0.25
     #if(round(simtime*100,2)%25==0):
