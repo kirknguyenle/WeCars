@@ -65,9 +65,11 @@ mdif = 0
 # - perform simulation steps until Webots is stopping the controller
 
 lastTime = 0
-steerRange = np.arange(-0.05, 0.0525, 0.00025)
+range = np.arange(-0.05, 0.0525, 0.00025)
+steerRange = np.flip(range)
+print(steerRange)
 stmotor.setAvailableForce(400)
-stmotor.setPosition(-0.05)
+stmotor.setPosition(0.0525)
 
 
 

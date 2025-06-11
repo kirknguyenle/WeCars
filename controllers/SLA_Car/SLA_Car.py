@@ -296,18 +296,18 @@ while robot.step(timestep) != -1:
 
     #radius = np.pow(vh,2)/np.round(accel_data[1],2)
 
-    strRack = np.interp(0, steer_angles, rack_extension)
+    strRack = np.interp(strA, steer_angles, rack_extension)
 
-    print(strRack)
+    print(simtime)
     print('---------------------------')
 
 
-    steeringRack[0].setPosition(0)
+    steeringRack[0].setPosition(strRack)
     steeringRack[1].setPosition(strRack)
 
     #Steer System Identification: 
 
-    if runsteer == False:
+    if runsteer == True:
         if(simtime > 1.7):
             strA = 0.32
     
