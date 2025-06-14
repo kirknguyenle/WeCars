@@ -7,7 +7,7 @@ import math
 from datetime import datetime as dt
 import json 
 
-s.path.insert(0,r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\extra_scripts\SupportScripts')
+s.path.insert(0,r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\extra_scripts\support_scripts')
 import carOrganizer as cO
 import tireHelper as th
 run = dt.now()
