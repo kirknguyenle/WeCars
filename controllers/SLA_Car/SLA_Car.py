@@ -39,10 +39,10 @@ steer_angles, rack_extension = np.loadtxt(r"C:\Users\minhk\OneDrive\Desktop\Driv
 
 print(steer_angles)
 
-mc_nodes = [[robot.getFromDef(cO.createLocationString(1,1)+"_contact"),
-            robot.getFromDef(cO.createLocationString(-1,1)+"_contact")],
-            [robot.getFromDef(cO.createLocationString(1,-1)+"_contact"),
-             robot.getFromDef(cO.createLocationString(-1,-1)+"_contact")]]
+mc_nodes = [[robot.getFromDef(cO.createLocationString(0,0)+"_contact"),
+            robot.getFromDef(cO.createLocationString(1,0)+"_contact")],
+            [robot.getFromDef(cO.createLocationString(0,1)+"_contact"),
+             robot.getFromDef(cO.createLocationString(1,1)+"_contact")]]
 
 
 
@@ -58,15 +58,15 @@ loads = [[robot.getDevice("flts"),
             [robot.getDevice("rlts"),
              robot.getDevice("rrts")]]
 
-steerSensors = [[robot.getDevice(cO.createLocationString(1,1)+"_inertial_name"),
-                 robot.getDevice(cO.createLocationString(-1,1)+"_inertial_name")],
-                [robot.getDevice(cO.createLocationString(1,-1)+"_inertial_name"),
-                 robot.getDevice(cO.createLocationString(-1,-1)+"_inertial_name")]]
+steerSensors = [[robot.getDevice(cO.createLocationString(0,0)+"_inertial_name"),
+                 robot.getDevice(cO.createLocationString(1,0)+"_inertial_name")],
+                [robot.getDevice(cO.createLocationString(0,1)+"_inertial_name"),
+                 robot.getDevice(cO.createLocationString(1,1)+"_inertial_name")]]
 
-wheelSensors = [[robot.getDevice(cO.createLocationString(1,1)+"_encoder"),
-                 robot.getDevice(cO.createLocationString(-1,1)+"_encoder")],
-                [robot.getDevice(cO.createLocationString(1,-1)+"_encoder"),
-                 robot.getDevice(cO.createLocationString(-1,-1)+"_encoder")]]
+wheelSensors = [[robot.getDevice(cO.createLocationString(0,0)+"_encoder"),
+                 robot.getDevice(cO.createLocationString(1,0)+"_encoder")],
+                [robot.getDevice(cO.createLocationString(0,1)+"_encoder"),
+                 robot.getDevice(cO.createLocationString(1,1)+"_encoder")]]
 
 steeringRack = [robot.getDevice("steer_left"),
                 robot.getDevice("steer_right")]
@@ -82,23 +82,23 @@ slipParams = [[mc_nodes[0][0].getField("forceDependentSlip"),
               [mc_nodes[1][0].getField("forceDependentSlip"),
                mc_nodes[1][1].getField("forceDependentSlip")]]
 
-if robot.getDevice(cO.createLocationString(1,1)+"_drive_motor") == None:
+if robot.getDevice(cO.createLocationString(0,0)+"_drive_motor") == None:
     s.exit(1)
 
-drives = [[robot.getDevice(cO.createLocationString(1,1)+"_drive_motor"),
-            robot.getDevice(cO.createLocationString(-1,1)+"_drive_motor")],
-            [robot.getDevice(cO.createLocationString(1,-1)+"_drive_motor"),
-             robot.getDevice(cO.createLocationString(-1,-1)+"_drive_motor")]]
+drives = [[robot.getDevice(cO.createLocationString(0,0)+"_drive_motor"),
+            robot.getDevice(cO.createLocationString(1,0)+"_drive_motor")],
+            [robot.getDevice(cO.createLocationString(0,1)+"_drive_motor"),
+             robot.getDevice(cO.createLocationString(1,1)+"_drive_motor")]]
 
-suspension = [[robot.getDevice(cO.createLocationString(1,1)+"_suspension_motor"),
-            robot.getDevice(cO.createLocationString(-1,1)+"_suspension_motor")],
-            [robot.getDevice(cO.createLocationString(1,-1)+"_suspension_motor"),
-             robot.getDevice(cO.createLocationString(-1,-1)+"_suspension_motor")]]
+suspension = [[robot.getDevice(cO.createLocationString(0,0)+"_suspension_motor"),
+            robot.getDevice(cO.createLocationString(1,0)+"_suspension_motor")],
+            [robot.getDevice(cO.createLocationString(0,1)+"_suspension_motor"),
+             robot.getDevice(cO.createLocationString(1,1)+"_suspension_motor")]]
 
-brakes = [[robot.getDevice(cO.createLocationString(1,1)+"_brake"),
-            robot.getDevice(cO.createLocationString(-1,1)+"_brake")],
-            [robot.getDevice(cO.createLocationString(1,-1)+"_brake"),
-             robot.getDevice(cO.createLocationString(-1,-1)+"_brake")]]
+brakes = [[robot.getDevice(cO.createLocationString(0,0)+"_brake"),
+            robot.getDevice(cO.createLocationString(1,0)+"_brake")],
+            [robot.getDevice(cO.createLocationString(0,1)+"_brake"),
+             robot.getDevice(cO.createLocationString(1,1)+"_brake")]]
 
 accel = robot.getDevice("accel")
 diff_cont = robot.getDevice("diffMan")
@@ -126,7 +126,7 @@ for i in range(2):
 
 
 for i in range(2):
-    steeringRack[i].setAvailableForce(6000)
+    steeringRack[i].setAvailableForce(8000)
     rearRods[i].setAvailableForce(40000)
     rearRods[i].setPosition(0)
 
@@ -298,35 +298,35 @@ while robot.step(timestep) != -1:
 
     strRack = np.interp(strA, steer_angles, rack_extension)
 
-    print(simtime)
+    print(strRack)
     print('---------------------------')
 
 
     steeringRack[0].setPosition(strRack)
     steeringRack[1].setPosition(strRack)
 
-    #Steer System Identification: 
+    
 
     if runsteer == True:
         if(simtime > 1.7):
-            strA = 0.32
+            strA = 0.1
     
         if(simtime > 3.7):
-            strA = 0.48
+            strA = 0.15
         if(simtime > 4.7):
-            strA = -0.48
+            strA = 0.0
 
     #driveRPM = driveVelocity/0.25
     #if(round(simtime*100,2)%25==0):
         #speeds = cO.simulateOpenDifferential(driveRPM, diffRatio)
     if rundrive == True:
         if simtime > 1:
-            drives[1][0].setTorque(250)
-            drives[1][1].setTorque(250)
+            drives[1][0].setTorque(150)
+            drives[1][1].setTorque(150)
     
         if simtime > 4:
-            drives[1][0].setTorque(400)
-            drives[1][1].setTorque(400)
+            drives[1][0].setTorque(150)
+            drives[1][1].setTorque(150)
 
 
     

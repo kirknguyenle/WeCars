@@ -1,8 +1,11 @@
 import numpy as np
 import pandas as pd
-"Helper File for Standardized Tire Data Interpetation for Webots"
 
+# Helper File for Standardized Tire Data Interpetation for Webots
 
+# Solves for webots Slip-Factor parameter for linear saturated tire model. 
+# Solves for cornering force only. (parameter 1)
+# Inputs: Upright Longitudinal Velocity, Cornering Stiffness, Slip, Saturation Force
 def simpleLinearSaturated(Vx,Stiffness, Slip, Saturation):
     S = 0
     if(Slip*Stiffness < Saturation):
@@ -11,7 +14,10 @@ def simpleLinearSaturated(Vx,Stiffness, Slip, Saturation):
     else:
         S = (np.tan(Slip))/(Vx*Saturation)
         return S
-
+    
+# Solves for webots Slip-Factor parameter for linear saturated tire model. 
+# Solves for longitudinal driving/braking force only. (parameter 0)
+# Inputs: Wheel Speed (linear),Upright Velocity, Longitudinal Stiffness, Saturation Force
 def simpleLinearSaturatedLong(Vw, Vc, Stiffness, Saturation):
     S = 0
     if(Vw == 0):
@@ -24,6 +30,17 @@ def simpleLinearSaturatedLong(Vw, Vc, Stiffness, Saturation):
         S = (Vw-Vc)/(Saturation)
         return S
 
+# Solves for webots Slip-Factor parameter for normal-force independent magic-formula model. 
+# Solves for cornering force only (parameter 1)
+# Inputs: Magic formula terms (B, C, D, E), Slip, Upright Longitudinal Velocity
+def simpleMFLat(B, C, D,E, Slip, Vx):
+    f_y = D*np.sin(C*np.arctan(B*Slip-E*(B*Slip-np.arctan(B*Slip))))
+    S = np.tan(Slip)/(Vx*f_y)
+    return S
+
+# Solves for webots Slip-Factor parameter for normal-force independent magic-formula model. 
+# Solves for longitudinal driving/braking force only. (parameter 0)
+# Inputs: Magic formula terms (B, C, D, E), Wheel Velocity, Longitudinal Velocity
 def simpleMFLong(B, C, D, E, Vw, Vc):
     if(Vw == 0):
         return 0
@@ -32,6 +49,9 @@ def simpleMFLong(B, C, D, E, Vw, Vc):
     S = ((Vw-Vc)/(f_r))
     return S
 
+# Solves for webots Slip-Factor parameter for normal-force dependent magic-formula model. 
+# Solves for cornering force only (parameter 1)
+# Inputs: Magic formula terms (B, C, D, E), Slip, Upright Longitudinal Velocity, Normal Force
 def mfzLat(B, C, D, E, Slip, Vx, fz):
     f_y = fz*D*np.sin(C*np.arctan(B*Slip-E*(B*Slip-np.arctan(B*Slip))))
     S = np.tan(Slip)/(Vx*f_y)
@@ -40,6 +60,9 @@ def mfzLat(B, C, D, E, Slip, Vx, fz):
     else:
         return S
 
+# Solves for webots Slip-Factor parameter for normal-force dependant magic-formula model. 
+# Solves for longitudinal driving/braking force only. (parameter 0)
+# Inputs: Magic formula terms (B, C, D, E), Wheel Velocity, Longitudinal Velocity, Normal Force
 def mfzLong(B, C, D, E, Vw, Vc, fz):
     SR = (((Vw/Vc)-1)*100)
     f_r = fz*D*np.sin(C*np.arctan(B*SR-E*(B*SR-np.arctan(B*SR))))
@@ -48,12 +71,6 @@ def mfzLong(B, C, D, E, Vw, Vc, fz):
         return 0
     else:
         return S
-
-def simpleMFLat(B, C, D,E, Slip, Vx):
-    f_y = D*np.sin(C*np.arctan(B*Slip-E*(B*Slip-np.arctan(B*Slip))))
-    S = np.tan(Slip)/(Vx*f_y)
-    return S
-
 
 def loadTireData(data, mu_max):
     table = pd.read_csv(data, header = None)

@@ -25,6 +25,5 @@
   "cornering_stiffness": 10000,
   "tractive_stiffness": 10000,
   "magic_formula_constants": [0.714, 1.4, 1, 0.2]
-
 }
   

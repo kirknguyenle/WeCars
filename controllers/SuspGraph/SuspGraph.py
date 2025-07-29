@@ -60,8 +60,7 @@ bmpt = []
 cmb = []
 pdif = 0
 mdif = 0
-# Main loop:
-# - perform simulation steps until Webots is stopping the controller
+
 
 lastTime = 0
 
