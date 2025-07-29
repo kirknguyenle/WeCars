@@ -6,7 +6,7 @@ import sys
 import math 
 import json
 
-s.path.insert(0,r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\extra_scripts\support_scripts')
+s.path.insert(0,r'C:\Users\minhk\OneDrive\Desktop\DriveLab\WeCars\script_library\support_scripts')
 import carOrganizer as cO
 
 #Instantiate Supervisor
