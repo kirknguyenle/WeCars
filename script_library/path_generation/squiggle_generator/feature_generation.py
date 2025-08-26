@@ -33,6 +33,18 @@ def linearLaneChange(path, theta, dy, increment):
 
     return path
 
+def linearFixedLaneChange(path, dx, dy, increment):
+    n = m.ceil(np.abs(dx)/increment)-1
+    slope = dy/dx
+    xf = path[0][len(path[0])-1]
+    yf = path[1][len(path[0])-1]
+    for i in range(n):
+        path[0].append(xf + (i+1)*increment)
+        path[1].append(yf + (i+1)*increment*slope) 
+    path[0].append(xf + (n+1)*increment)
+    path[1].append(yf + dy)
+    return path
+
 def sinLaneChange(path, dx, dy, increment):
     n = m.ceil(abs(dx)/increment)
     xf = path[0][len(path[0])-1]
